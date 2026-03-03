@@ -142,8 +142,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // 일일 타임테이블 초기화 및 렌더링
+  const todayDate = new Date();
+  const todayDayIdx = (todayDate.getDay() + 6) % 7; // 0: Mon ~ 6: Sun
+  const todayStr = todayDate.toISOString().split('T')[0];
+  
+  const weeklyData = JSON.parse(localStorage.getItem('studyPlannerWeekly')) || {};
+  let dailyData = JSON.parse(localStorage.getItem('studyPlannerDaily')) || { date: '', blocks: {} };
 
-  // 타임테이블 렌더링
+  // 날짜가 바뀌었으면 위클리 템플릿으로 오늘 타임테이블 덮어쓰기
+  if (dailyData.date !== todayStr) {
+    dailyData = { date: todayStr, blocks: {} };
+    for (let hour = 6; hour < 27; hour++) {
+      const h = hour % 24;
+      const displayHour = h.toString().padStart(2, '0');
+      const timeKey = `${todayDayIdx}-${displayHour}`;
+      if (weeklyData[timeKey]) {
+        for(let m=0; m<60; m+=10) {
+          const mStr = m.toString().padStart(2, '0');
+          dailyData.blocks[`${displayHour}:${mStr}`] = weeklyData[timeKey];
+        }
+      }
+    }
+    localStorage.setItem('studyPlannerDaily', JSON.stringify(dailyData));
+  }
+
   const hoursToRender = 21; 
   for (let i = 0; i < hoursToRender; i++) {
     const hour = (6 + i) % 24;
@@ -154,12 +177,12 @@ document.addEventListener('DOMContentLoaded', () => {
     hourRow.innerHTML = `
       <div class="hour-label">${displayHour}</div>
       <div class="minutes-blocks">
-        <div class="min-block" data-time="${displayHour}:00"></div>
-        <div class="min-block" data-time="${displayHour}:10"></div>
-        <div class="min-block" data-time="${displayHour}:20"></div>
-        <div class="min-block" data-time="${displayHour}:30"></div>
-        <div class="min-block" data-time="${displayHour}:40"></div>
-        <div class="min-block" data-time="${displayHour}:50"></div>
+        ${[0,10,20,30,40,50].map(m => {
+          const mStr = m.toString().padStart(2, '0');
+          const blockTime = `${displayHour}:${mStr}`;
+          const color = dailyData.blocks[blockTime];
+          return `<div class="min-block" data-time="${blockTime}" ${color ? `style="background-color: ${color};" data-painted-color="${color}"` : ''}></div>`;
+        }).join('')}
       </div>
     `;
     if(timelineGrid) timelineGrid.appendChild(hourRow);
@@ -168,13 +191,17 @@ document.addEventListener('DOMContentLoaded', () => {
   if(timelineGrid) {
     timelineGrid.addEventListener('click', (e) => {
       if (e.target.classList.contains('min-block')) {
+        const timeStr = e.target.dataset.time;
         if (e.target.dataset.paintedColor === activeColor) {
           e.target.style.backgroundColor = '';
           delete e.target.dataset.paintedColor;
+          delete dailyData.blocks[timeStr];
         } else {
           e.target.style.backgroundColor = activeColor;
           e.target.dataset.paintedColor = activeColor;
+          dailyData.blocks[timeStr] = activeColor;
         }
+        localStorage.setItem('studyPlannerDaily', JSON.stringify(dailyData));
       }
     });
   }

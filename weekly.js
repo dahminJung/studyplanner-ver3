@@ -1,6 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
   const gridBody = document.getElementById('weekly-grid-body');
   const subjectPickerGroup = document.getElementById('weekly-subject-picker-group');
+  const editBtn = document.getElementById('edit-weekly-btn');
+  const saveBtn = document.getElementById('save-weekly-btn');
+  
+  let isEditMode = false;
+  let weeklyData = JSON.parse(localStorage.getItem('studyPlannerWeekly')) || {};
   
   // 기본 설정된 과목 데이터 불러오기
   let subjects = JSON.parse(localStorage.getItem('studyPlannerSubjects')) || [
@@ -60,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const displayHour = hour.toString().padStart(2, '0');
       dayHTML += `
         <div class="weekly-hour-cell">
-          <div class="weekly-min-block" data-time="${d}-${displayHour}:00" style="height: 100%;"></div>
+          <div class="weekly-min-block" data-time="${d}-${displayHour}" style="height: 100%;"></div>
         </div>
       `;
     }
@@ -71,8 +76,19 @@ document.addEventListener('DOMContentLoaded', () => {
   if(gridBody) {
     gridBody.innerHTML = timeColHTML + daysHTML;
 
-    // Click to paint 10-min block with the active color
+    // Load saved data
+    document.querySelectorAll('.weekly-min-block').forEach(block => {
+      const timeKey = block.dataset.time;
+      if (weeklyData[timeKey]) {
+        block.style.backgroundColor = weeklyData[timeKey];
+        block.dataset.paintedColor = weeklyData[timeKey];
+      }
+    });
+
+    // Click to paint block with the active color
     gridBody.addEventListener('click', (e) => {
+      if (!isEditMode) return; // Prevent editing if not in edit mode
+      
       if (e.target.classList.contains('weekly-min-block')) {
         if (e.target.dataset.paintedColor === activeColor) {
           // 이미 같은 색이면 지우기 (Toggle off)
@@ -84,6 +100,41 @@ document.addEventListener('DOMContentLoaded', () => {
           e.target.dataset.paintedColor = activeColor;
         }
       }
+    });
+  }
+
+  // Edit / Save logic
+  if(editBtn && saveBtn) {
+    editBtn.addEventListener('click', () => {
+      isEditMode = true;
+      editBtn.style.display = 'none';
+      saveBtn.style.display = 'block';
+      if(subjectPickerGroup) {
+        subjectPickerGroup.style.opacity = '1';
+        subjectPickerGroup.style.pointerEvents = 'auto';
+      }
+      gridBody.style.cursor = 'pointer';
+    });
+
+    saveBtn.addEventListener('click', () => {
+      isEditMode = false;
+      saveBtn.style.display = 'none';
+      editBtn.style.display = 'block';
+      if(subjectPickerGroup) {
+        subjectPickerGroup.style.opacity = '0.5';
+        subjectPickerGroup.style.pointerEvents = 'none';
+      }
+      gridBody.style.cursor = 'default';
+
+      // Save to localStorage
+      const newData = {};
+      document.querySelectorAll('.weekly-min-block').forEach(block => {
+        if (block.dataset.paintedColor) {
+          newData[block.dataset.time] = block.dataset.paintedColor;
+        }
+      });
+      localStorage.setItem('studyPlannerWeekly', JSON.stringify(newData));
+      alert('위클리 타임테이블이 저장되었습니다!');
     });
   }
 });

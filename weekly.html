@@ -32,8 +32,12 @@
     <main class="weekly-main card">
       <div class="section-header">
         <h3>WEEKLY TIME TABLE</h3>
-        <div class="color-picker-group" id="weekly-subject-picker-group">
-          <!-- Rendered by JS -->
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <button id="edit-weekly-btn" class="primary-btn" style="background-color: var(--text-muted); padding: 0.4rem 0.8rem; font-size: 0.8rem;">변경하기</button>
+          <button id="save-weekly-btn" class="primary-btn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; display: none;">저장</button>
+          <div class="color-picker-group" id="weekly-subject-picker-group" style="opacity: 0.5; pointer-events: none;">
+            <!-- Rendered by JS -->
+          </div>
         </div>
       </div>
       <div class="weekly-timeline-box">
