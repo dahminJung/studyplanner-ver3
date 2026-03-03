@@ -85,6 +85,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const countDisplay = document.querySelector('.task-count');
   
   if (taskList) {
+    // Generate 12 task items dynamically
+    taskList.innerHTML = Array.from({length: 12}, () => `
+      <div class="task-item">
+        <input type="checkbox" class="task-checkbox">
+        <input type="text" class="task-input" placeholder="할 일을 입력하세요.">
+      </div>
+    `).join('');
+
     taskList.addEventListener('change', (e) => {
       if (e.target.classList.contains('task-checkbox')) {
         const allCheckboxes = taskList.querySelectorAll('.task-checkbox');
