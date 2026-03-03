@@ -20,6 +20,11 @@
       <div class="header-right">
         <span class="badge badge-accent">D-DAY</span>
         <span class="header-dday">100</span>
+        <button class="icon-btn" style="margin-left: 0.5rem;" onclick="window.location.href='weekly.html'" title="위클리 플래너">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </button>
         <button class="icon-btn" style="margin-left: 0.5rem;" onclick="window.location.href='settings.html'" title="기본 설정">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"></circle>
@@ -39,7 +44,26 @@
 
     <!-- Main Content -->
     <div class="main-layout">
-      <!-- Left: To-Do List -->
+      <!-- Left: Timetable -->
+      <section class="timetable-container card">
+        <div class="section-header">
+          <h3>TIME TABLE</h3>
+          <div class="color-picker-group" id="subject-picker-group">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+        <div class="timeline-box">
+          <div class="timeline-header">
+            <span>H</span>
+            <span>10</span><span>20</span><span>30</span><span>40</span><span>50</span>
+          </div>
+          <div class="timeline-grid" id="timeline-grid">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: To-Do List -->
       <section class="tasks-container card">
         <div class="section-header">
           <h3>TASKS</h3>
@@ -57,25 +81,6 @@
         </form>
         <div class="task-items" id="task-list">
           <!-- Rendered by JS -->
-        </div>
-      </section>
-
-      <!-- Right: Timetable -->
-      <section class="timetable-container card">
-        <div class="section-header">
-          <h3>TIME TABLE</h3>
-          <div class="color-picker-group" id="subject-picker-group">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
-        <div class="timeline-box">
-          <div class="timeline-header">
-            <span>H</span>
-            <span>10</span><span>20</span><span>30</span><span>40</span><span>50</span>
-          </div>
-          <div class="timeline-grid" id="timeline-grid">
-            <!-- Rendered by JS -->
-          </div>
         </div>
       </section>
     </div>
