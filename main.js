@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const gridBody = document.getElementById('weekly-grid-body'); // Changed to weekly grid
+  const gridBody = document.getElementById('daily-grid-body'); // Changed to daily grid
   const subjectPickerGroup = document.getElementById('subject-picker-group');
   const taskForm = document.getElementById('task-form');
   const taskList = document.getElementById('task-list');
@@ -137,10 +137,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 메인 화면용 위클리 타임테이블 대시보드 (읽기 전용) 렌더링
+  // 메인 화면용 일일 타임테이블 대시보드 (읽기 전용) 렌더링
   const weeklyData = JSON.parse(localStorage.getItem('studyPlannerWeekly')) || {};
   const startTime = 6;
   const hoursToRender = 21; 
+  const dailyHeaderRow = document.getElementById('daily-header-row');
+  const dayOfWeek = todayDate.getDay();
+  const todayDayIdx = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // 0: Mon, 6: Sun
+  const dayNames = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+
+  if (dailyHeaderRow) {
+    dailyHeaderRow.innerHTML = `
+      <span>H</span>
+      <span>${dayNames[todayDayIdx]}<br><small style="font-weight:normal; font-size:0.7rem;">${todayDate.getMonth()+1}/${todayDate.getDate()}</small></span>
+    `;
+  }
 
   if (gridBody) {
     let timeColHTML = '<div class="weekly-time-col">';
@@ -151,27 +162,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     timeColHTML += '</div>';
 
-    let daysHTML = '';
-    // 7 days (MON to SUN)
-    for(let d=0; d<7; d++) {
-      let dayHTML = `<div class="weekly-day-col" data-day="${d}">`;
-      for (let i = 0; i < hoursToRender; i++) {
-        const hour = (startTime + i) % 24;
-        const displayHour = hour.toString().padStart(2, '0');
-        const timeKey = `${d}-${displayHour}`;
-        const color = weeklyData[timeKey] || '';
-        
-        dayHTML += `
-          <div class="weekly-hour-cell">
-            <div class="weekly-min-block" style="height: 100%; cursor: default; ${color ? `background-color: ${color};` : ''}"></div>
-          </div>
-        `;
-      }
-      dayHTML += '</div>';
-      daysHTML += dayHTML;
+    let dayHTML = `<div class="weekly-day-col" data-day="${todayDayIdx}" style="border-right: none;">`;
+    for (let i = 0; i < hoursToRender; i++) {
+      const hour = (startTime + i) % 24;
+      const displayHour = hour.toString().padStart(2, '0');
+      const timeKey = `${todayDayIdx}-${displayHour}`;
+      const color = weeklyData[timeKey] || '';
+      
+      dayHTML += `
+        <div class="weekly-hour-cell">
+          <div class="weekly-min-block" style="height: 100%; cursor: default; ${color ? `background-color: ${color};` : ''}"></div>
+        </div>
+      `;
     }
+    dayHTML += '</div>';
 
-    gridBody.innerHTML = timeColHTML + daysHTML;
+    gridBody.innerHTML = timeColHTML + dayHTML;
   }
 
   // 초기화

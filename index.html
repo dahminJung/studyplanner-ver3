@@ -44,20 +44,20 @@
 
     <!-- Main Content -->
     <div class="main-layout">
-      <!-- Left: Weekly Timetable Dashboard -->
+      <!-- Left: Daily Timetable Dashboard -->
       <section class="timetable-container card">
         <div class="section-header">
-          <h3>WEEKLY TIME TABLE</h3>
+          <h3>TODAY'S TIME TABLE</h3>
           <div class="color-picker-group" id="subject-picker-group" style="pointer-events: none;">
             <!-- Rendered by JS as Legend -->
           </div>
         </div>
         <div class="weekly-timeline-box">
-          <div class="weekly-header-row">
+          <div class="weekly-header-row" id="daily-header-row" style="grid-template-columns: 40px 1fr;">
             <span>H</span>
-            <span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span>
+            <span id="today-header-name">TODAY</span>
           </div>
-          <div class="weekly-grid-body" id="weekly-grid-body">
+          <div class="weekly-grid-body" id="daily-grid-body" style="grid-template-columns: 40px 1fr;">
             <!-- Rendered by JS -->
           </div>
         </div>
