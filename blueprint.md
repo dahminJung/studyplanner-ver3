@@ -3,16 +3,15 @@
 ## Overview
 A digital study planner that inherits the highly effective structured layout of 10-minute planners (Date, Goal, Tasks, Time Table, Reflection) but presents it in a clean, modern web-native UI.
 
-## Design Aesthetic (Digital-Native)
-* **Clean & Minimal**: Soft gray/white backgrounds with vibrant primary accents.
-* **Card UI**: Each section (Tasks, Timetable, etc.) is a rounded, white card with subtle shadows for a "lifted" feel.
-* **Modern Typography**: High-readability sans-serif fonts (Noto Sans KR).
-* **Interactive Elements**: Buttons and inputs with hover effects and focus states.
+## New Feature: Settings Page
+* **Purpose**: Allow users to define their subjects/categories and assign specific light/pastel colors to them.
+* **Storage**: Data is saved to `localStorage` so it persists and can be used in the main planner.
+* **UI**: A dedicated `settings.html` page accessible via a button in the main header.
 
-## Layout Components (Same as Analog, Modernized)
-1. **Top Bar**: Date and D-Day in a concise header.
+## Layout Components
+1. **Top Bar**: Date, D-Day, and a 'Settings' button.
 2. **Goal Banner**: High-impact section for the daily objective.
 3. **Main Content (Two Columns)**:
-   - **Left Column**: Tasks with checkboxes (interactive).
-   - **Right Column**: 10-Minute Timetable (Modernized grid with color pickers).
+   - **Left Column**: Tasks with checkboxes.
+   - **Right Column**: 10-Minute Timetable. The color picker now dynamically loads the user's subjects/colors from settings.
 4. **Footer**: Total time summary and a large reflection text area.
