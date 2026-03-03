@@ -60,12 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const displayHour = hour.toString().padStart(2, '0');
       dayHTML += `
         <div class="weekly-hour-cell">
-          <div class="weekly-min-block" data-time="${d}-${displayHour}:00"></div>
-          <div class="weekly-min-block" data-time="${d}-${displayHour}:10"></div>
-          <div class="weekly-min-block" data-time="${d}-${displayHour}:20"></div>
-          <div class="weekly-min-block" data-time="${d}-${displayHour}:30"></div>
-          <div class="weekly-min-block" data-time="${d}-${displayHour}:40"></div>
-          <div class="weekly-min-block" data-time="${d}-${displayHour}:50"></div>
+          <div class="weekly-min-block" data-time="${d}-${displayHour}:00" style="height: 100%;"></div>
         </div>
       `;
     }
