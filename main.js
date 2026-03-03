@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const timelineGrid = document.getElementById('timeline-grid');
+  const gridBody = document.getElementById('weekly-grid-body'); // Changed to weekly grid
   const subjectPickerGroup = document.getElementById('subject-picker-group');
   const taskForm = document.getElementById('task-form');
   const taskList = document.getElementById('task-list');
@@ -24,28 +24,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // 할 일 데이터 불러오기
   let tasks = JSON.parse(localStorage.getItem('studyPlannerTasks')) || [];
 
-  let activeColor = subjects.length > 0 ? subjects[0].color : '#fca5a5';
-
-  // 설정된 과목에 따라 색상 버튼 및 Select 렌더링
+  // 설정된 과목에 따라 색상 버튼(범례) 및 Select 렌더링
   function renderSubjectPickers() {
     if (subjectPickerGroup) {
       subjectPickerGroup.innerHTML = '';
       if (subjects.length === 0) {
         subjectPickerGroup.innerHTML = '<span style="font-size: 0.75rem; color: #64748b;">설정에서 과목을 추가하세요</span>';
       } else {
-        subjects.forEach((subject, index) => {
-          const btn = document.createElement('button');
-          btn.className = `color-btn ${index === 0 ? 'active' : ''}`;
+        subjects.forEach((subject) => {
+          const btn = document.createElement('div'); // Changed to div so it's clearly a legend
+          btn.className = `color-btn`;
           btn.style.backgroundColor = subject.color;
+          btn.style.cursor = 'default';
           btn.title = subject.name;
-          btn.dataset.color = subject.color;
-          
-          btn.addEventListener('click', (e) => {
-            document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-            activeColor = e.target.dataset.color;
-          });
-          
           subjectPickerGroup.appendChild(btn);
         });
       }
@@ -90,20 +81,17 @@ document.addEventListener('DOMContentLoaded', () => {
     updateTaskCount();
   }
 
-  // 할 일 개수 업데이트
   function updateTaskCount() {
     if (!countDisplay) return;
     const completed = tasks.filter(t => t.completed).length;
     countDisplay.textContent = `${completed} / ${tasks.length}`;
   }
 
-  // 데이터 저장 및 렌더링 헬퍼
   function saveAndRenderTasks() {
     localStorage.setItem('studyPlannerTasks', JSON.stringify(tasks));
     renderTasks();
   }
 
-  // 할 일 폼 제출 이벤트
   if (taskForm) {
     taskForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -128,7 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 할 일 체크박스 및 삭제 이벤트 (이벤트 위임)
   if (taskList) {
     taskList.addEventListener('change', (e) => {
       if (e.target.classList.contains('task-checkbox')) {
@@ -150,71 +137,41 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 일일 타임테이블 초기화 및 렌더링
-  const todayDayIdx = (todayDate.getDay() + 6) % 7; // 0: Mon ~ 6: Sun
-  const todayStr = todayDate.toLocaleDateString('en-CA'); // YYYY-MM-DD
-  
+  // 메인 화면용 위클리 타임테이블 대시보드 (읽기 전용) 렌더링
   const weeklyData = JSON.parse(localStorage.getItem('studyPlannerWeekly')) || {};
-  let dailyData = JSON.parse(localStorage.getItem('studyPlannerDaily')) || { date: '', blocks: {} };
-  const weeklyLastUpdate = parseInt(localStorage.getItem('studyPlannerWeeklyLastUpdate') || '0');
-  const dailyLastSync = parseInt(localStorage.getItem('studyPlannerDailyLastSync') || '0');
-
-  // 날짜가 바뀌었거나, 위클리 타임테이블이 방금 수정(저장)되었다면 동기화
-  if (dailyData.date !== todayStr || weeklyLastUpdate > dailyLastSync) {
-    dailyData = { date: todayStr, blocks: {} }; // 기존 일일 데이터 덮어쓰기
-    for (let hour = 6; hour < 27; hour++) {
-      const h = hour % 24;
-      const displayHour = h.toString().padStart(2, '0');
-      const timeKey = `${todayDayIdx}-${displayHour}`;
-      if (weeklyData[timeKey]) {
-        for(let m=0; m<60; m+=10) {
-          const mStr = m.toString().padStart(2, '0');
-          dailyData.blocks[`${displayHour}:${mStr}`] = weeklyData[timeKey];
-        }
-      }
-    }
-    localStorage.setItem('studyPlannerDaily', JSON.stringify(dailyData));
-    localStorage.setItem('studyPlannerDailyLastSync', Date.now().toString());
-  }
-
+  const startTime = 6;
   const hoursToRender = 21; 
-  if (timelineGrid) {
-    timelineGrid.innerHTML = '';
+
+  if (gridBody) {
+    let timeColHTML = '<div class="weekly-time-col">';
     for (let i = 0; i < hoursToRender; i++) {
-      const hour = (6 + i) % 24;
-      const hourRow = document.createElement('div');
-      hourRow.className = 'hour-row';
+      const hour = (startTime + i) % 24;
       const displayHour = hour.toString().padStart(2, '0');
-      
-      hourRow.innerHTML = `
-        <div class="hour-label">${displayHour}</div>
-        <div class="minutes-blocks">
-          ${[0,10,20,30,40,50].map(m => {
-            const mStr = m.toString().padStart(2, '0');
-            const blockTime = `${displayHour}:${mStr}`;
-            const color = dailyData.blocks[blockTime];
-            return `<div class="min-block" data-time="${blockTime}" ${color ? `style="background-color: ${color};" data-painted-color="${color}"` : ''}></div>`;
-          }).join('')}
-        </div>
-      `;
-      timelineGrid.appendChild(hourRow);
+      timeColHTML += `<div class="weekly-hour-label">${displayHour}</div>`;
+    }
+    timeColHTML += '</div>';
+
+    let daysHTML = '';
+    // 7 days (MON to SUN)
+    for(let d=0; d<7; d++) {
+      let dayHTML = `<div class="weekly-day-col" data-day="${d}">`;
+      for (let i = 0; i < hoursToRender; i++) {
+        const hour = (startTime + i) % 24;
+        const displayHour = hour.toString().padStart(2, '0');
+        const timeKey = `${d}-${displayHour}`;
+        const color = weeklyData[timeKey] || '';
+        
+        dayHTML += `
+          <div class="weekly-hour-cell">
+            <div class="weekly-min-block" style="height: 100%; cursor: default; ${color ? `background-color: ${color};` : ''}"></div>
+          </div>
+        `;
+      }
+      dayHTML += '</div>';
+      daysHTML += dayHTML;
     }
 
-    timelineGrid.addEventListener('click', (e) => {
-      if (e.target.classList.contains('min-block')) {
-        const timeStr = e.target.dataset.time;
-        if (e.target.dataset.paintedColor === activeColor) {
-          e.target.style.backgroundColor = '';
-          delete e.target.dataset.paintedColor;
-          delete dailyData.blocks[timeStr];
-        } else {
-          e.target.style.backgroundColor = activeColor;
-          e.target.dataset.paintedColor = activeColor;
-          dailyData.blocks[timeStr] = activeColor;
-        }
-        localStorage.setItem('studyPlannerDaily', JSON.stringify(dailyData));
-      }
-    });
+    gridBody.innerHTML = timeColHTML + daysHTML;
   }
 
   // 초기화
