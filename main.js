@@ -1,6 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
   const timelineGrid = document.getElementById('timeline-grid');
   const subjectPickerGroup = document.getElementById('subject-picker-group');
+  const taskForm = document.getElementById('task-form');
+  const taskList = document.getElementById('task-list');
+  const countDisplay = document.querySelector('.task-count');
+  const subjectSelect = document.getElementById('new-task-subject');
+  const titleInput = document.getElementById('new-task-title');
   
   // 기본 설정된 과목 데이터 불러오기
   let subjects = JSON.parse(localStorage.getItem('studyPlannerSubjects')) || [
@@ -8,46 +13,142 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: 2, name: '영어', color: '#93c5fd' }
   ];
 
+  // 할 일 데이터 불러오기
+  let tasks = JSON.parse(localStorage.getItem('studyPlannerTasks')) || [];
+
   let activeColor = subjects.length > 0 ? subjects[0].color : '#fca5a5';
 
-  // 설정된 과목에 따라 색상 버튼 렌더링
+  // 설정된 과목에 따라 색상 버튼 및 Select 렌더링
   function renderSubjectPickers() {
-    if (!subjectPickerGroup) return;
-    subjectPickerGroup.innerHTML = '';
-    
-    if (subjects.length === 0) {
-      subjectPickerGroup.innerHTML = '<span style="font-size: 0.75rem; color: #64748b;">설정에서 과목을 추가하세요</span>';
-      return;
+    if (subjectPickerGroup) {
+      subjectPickerGroup.innerHTML = '';
+      if (subjects.length === 0) {
+        subjectPickerGroup.innerHTML = '<span style="font-size: 0.75rem; color: #64748b;">설정에서 과목을 추가하세요</span>';
+      } else {
+        subjects.forEach((subject, index) => {
+          const btn = document.createElement('button');
+          btn.className = `color-btn ${index === 0 ? 'active' : ''}`;
+          btn.style.backgroundColor = subject.color;
+          btn.title = subject.name;
+          btn.dataset.color = subject.color;
+          
+          btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            activeColor = e.target.dataset.color;
+          });
+          
+          subjectPickerGroup.appendChild(btn);
+        });
+      }
     }
 
-    subjects.forEach((subject, index) => {
-      const btn = document.createElement('button');
-      btn.className = `color-btn ${index === 0 ? 'active' : ''}`;
-      btn.style.backgroundColor = subject.color;
-      btn.title = subject.name;
-      btn.dataset.color = subject.color;
-      
-      btn.addEventListener('click', (e) => {
-        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
-        e.target.classList.add('active');
-        activeColor = e.target.dataset.color;
+    if (subjectSelect) {
+      subjectSelect.innerHTML = '<option value="" disabled selected>과목 선택</option>';
+      subjects.forEach(subject => {
+        const option = document.createElement('option');
+        option.value = subject.id;
+        option.textContent = subject.name;
+        subjectSelect.appendChild(option);
       });
-      
-      subjectPickerGroup.appendChild(btn);
+    }
+  }
+
+  // 할 일 목록 렌더링
+  function renderTasks() {
+    if (!taskList) return;
+    taskList.innerHTML = '';
+
+    if (tasks.length === 0) {
+      taskList.innerHTML = '<div style="text-align:center; padding: 1rem; color: var(--text-muted); font-size: 0.9rem;">할 일을 추가해보세요!</div>';
+    } else {
+      tasks.forEach(task => {
+        const subject = subjects.find(s => s.id === task.subjectId) || { name: '지정 안됨', color: '#cbd5e1' };
+        
+        const item = document.createElement('div');
+        item.className = `task-item ${task.completed ? 'completed' : ''}`;
+        item.style.borderLeftColor = subject.color;
+        
+        item.innerHTML = `
+          <input type="checkbox" class="task-checkbox" data-id="${task.id}" ${task.completed ? 'checked' : ''}>
+          <span class="task-title-text">${task.title}</span>
+          <span class="task-subject-badge" style="background-color: ${subject.color}">${subject.name}</span>
+          <button type="button" class="task-delete-btn" data-id="${task.id}">&times;</button>
+        `;
+        
+        taskList.appendChild(item);
+      });
+    }
+    updateTaskCount();
+  }
+
+  // 할 일 개수 업데이트
+  function updateTaskCount() {
+    if (!countDisplay) return;
+    const completed = tasks.filter(t => t.completed).length;
+    countDisplay.textContent = `${completed} / ${tasks.length}`;
+  }
+
+  // 데이터 저장 및 렌더링 헬퍼
+  function saveAndRenderTasks() {
+    localStorage.setItem('studyPlannerTasks', JSON.stringify(tasks));
+    renderTasks();
+  }
+
+  // 할 일 폼 제출 이벤트
+  if (taskForm) {
+    taskForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = titleInput.value.trim();
+      const subjectId = parseInt(subjectSelect.value);
+
+      if (!title || isNaN(subjectId)) {
+        alert('할 일과 과목을 모두 입력/선택해주세요.');
+        return;
+      }
+
+      tasks.push({
+        id: Date.now(),
+        title: title,
+        subjectId: subjectId,
+        completed: false
+      });
+
+      titleInput.value = '';
+      subjectSelect.value = '';
+      saveAndRenderTasks();
     });
   }
 
-  renderSubjectPickers();
+  // 할 일 체크박스 및 삭제 이벤트 (이벤트 위임)
+  if (taskList) {
+    taskList.addEventListener('change', (e) => {
+      if (e.target.classList.contains('task-checkbox')) {
+        const id = parseInt(e.target.dataset.id);
+        const task = tasks.find(t => t.id === id);
+        if (task) {
+          task.completed = e.target.checked;
+          saveAndRenderTasks();
+        }
+      }
+    });
 
-  // Generate 10-min Timetable (06:00 to 02:00 next day)
-  const startTime = 6;
+    taskList.addEventListener('click', (e) => {
+      if (e.target.classList.contains('task-delete-btn')) {
+        const id = parseInt(e.target.dataset.id);
+        tasks = tasks.filter(t => t.id !== id);
+        saveAndRenderTasks();
+      }
+    });
+  }
+
+
+  // 타임테이블 렌더링
   const hoursToRender = 21; 
-
   for (let i = 0; i < hoursToRender; i++) {
-    const hour = (startTime + i) % 24;
+    const hour = (6 + i) % 24;
     const hourRow = document.createElement('div');
     hourRow.className = 'hour-row';
-    
     const displayHour = hour.toString().padStart(2, '0');
     
     hourRow.innerHTML = `
@@ -61,44 +162,24 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="min-block" data-time="${displayHour}:50"></div>
       </div>
     `;
-    
-    timelineGrid.appendChild(hourRow);
+    if(timelineGrid) timelineGrid.appendChild(hourRow);
   }
 
-  // Click to paint 10-min block with the active color
-  timelineGrid.addEventListener('click', (e) => {
-    if (e.target.classList.contains('min-block')) {
-      if (e.target.dataset.paintedColor === activeColor) {
-        // 이미 같은 색이면 지우기 (Toggle off)
-        e.target.style.backgroundColor = '';
-        delete e.target.dataset.paintedColor;
-      } else {
-        // 다른 색이거나 칠해져있지 않으면 현재 액티브 색상으로 칠하기
-        e.target.style.backgroundColor = activeColor;
-        e.target.dataset.paintedColor = activeColor;
-      }
-    }
-  });
-
-  // Task list completion count logic
-  const taskList = document.getElementById('task-list');
-  const countDisplay = document.querySelector('.task-count');
-  
-  if (taskList) {
-    // Generate 12 task items dynamically
-    taskList.innerHTML = Array.from({length: 12}, () => `
-      <div class="task-item">
-        <input type="checkbox" class="task-checkbox">
-        <input type="text" class="task-input" placeholder="할 일을 입력하세요.">
-      </div>
-    `).join('');
-
-    taskList.addEventListener('change', (e) => {
-      if (e.target.classList.contains('task-checkbox')) {
-        const allCheckboxes = taskList.querySelectorAll('.task-checkbox');
-        const checked = Array.from(allCheckboxes).filter(cb => cb.checked).length;
-        countDisplay.textContent = `${checked} / ${allCheckboxes.length}`;
+  if(timelineGrid) {
+    timelineGrid.addEventListener('click', (e) => {
+      if (e.target.classList.contains('min-block')) {
+        if (e.target.dataset.paintedColor === activeColor) {
+          e.target.style.backgroundColor = '';
+          delete e.target.dataset.paintedColor;
+        } else {
+          e.target.style.backgroundColor = activeColor;
+          e.target.dataset.paintedColor = activeColor;
+        }
       }
     });
   }
+
+  // 초기화
+  renderSubjectPickers();
+  renderTasks();
 });
