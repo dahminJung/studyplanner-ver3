@@ -1,11 +1,11 @@
 :root {
-  --primary-color: #4f46e5;
-  --primary-hover: #4338ca;
-  --bg-color: #f3f4f6;
-  --surface-color: #ffffff;
-  --text-main: #1f2937;
-  --text-muted: #6b7280;
-  --border-color: #e5e7eb;
+  --paper-bg: #fffdfa;
+  --grid-line: #e2e8f0;
+  --accent-pink: #fbcfe8;
+  --accent-blue: #bfdbfe;
+  --text-dark: #374151;
+  --text-muted: #9ca3af;
+  --border-main: #4b5563;
 }
 
 * {
@@ -15,30 +15,226 @@
 }
 
 body {
-  font-family: system-ui, -apple-system, sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-main);
-  line-height: 1.5;
-  padding: 1rem;
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: #d1d5db;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+  color: var(--text-dark);
 }
 
-.app-container {
-  max-width: 1000px;
-  margin: 0 auto;
+/* Analog Paper Texture */
+.planner-paper {
+  background-color: var(--paper-bg);
+  width: 100%;
+  max-width: 800px;
+  min-height: 1100px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  /* Grid pattern background */
+  background-image: 
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
-header {
-  text-align: center;
+/* Subtle noise effect */
+.planner-paper::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  opacity: 0.03;
+  pointer-events: none;
+  background: url('https://www.transparenttextures.com/patterns/natural-paper.png');
+}
+
+.label {
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: #fff;
+  background-color: var(--border-main);
+  padding: 2px 8px;
+  border-radius: 2px;
+  letter-spacing: 1px;
+}
+
+/* Header Section */
+.planner-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border-main);
+  padding-bottom: 0.5rem;
+}
+
+.date-section, .dday-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.value {
+  font-family: 'Nanum Pen Script', cursive;
+  font-size: 1.5rem;
+}
+
+/* Goal Section */
+.goal-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
   margin-bottom: 2rem;
-  padding-top: 1rem;
 }
 
-header h1 {
-  font-size: 2.5rem;
-  color: var(--primary-color);
-  margin-bottom: 0.5rem;
+.goal-input {
+  flex: 1;
+  font-family: 'Nanum Pen Script', cursive;
+  font-size: 1.8rem;
+  border-bottom: 1px solid var(--text-muted);
+  padding: 0.2rem 0.5rem;
 }
 
-header p {
-  color: var(--text-muted);
+/* Main Layout */
+.planner-main {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  border-left: 4px solid var(--border-main);
+  padding-left: 0.5rem;
+}
+
+/* Task List */
+.task-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.check-box {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--border-main);
+  border-radius: 50%;
+}
+
+.task-text {
+  flex: 1;
+  height: 24px;
+}
+
+.line-grid {
+  border-bottom: 1px solid var(--grid-line);
+}
+
+/* Time Table */
+.timeline-container {
+  border: 1px solid var(--border-main);
+  background: white;
+}
+
+.timeline-header {
+  display: grid;
+  grid-template-columns: 40px repeat(5, 1fr);
+  font-size: 0.65rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border-main);
+  background: #f8fafc;
+  padding: 4px 0;
+}
+
+.timeline-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+.hour-row {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  height: 24px;
+  border-bottom: 1px solid var(--grid-line);
+}
+
+.hour-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--border-main);
+  background: #f1f5f9;
+}
+
+.minutes-blocks {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.min-block {
+  border-right: 1px dashed var(--grid-line);
+  cursor: pointer;
+}
+
+.min-block:last-child {
+  border-right: none;
+}
+
+.min-block.filled {
+  background-color: var(--accent-pink);
+}
+
+/* Footer Section */
+.planner-footer {
+  border-top: 2px solid var(--border-main);
+  padding-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.total-time {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.total-time .value {
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.memo-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.memo-area {
+  min-height: 100px;
+  background-image: repeating-linear-gradient(transparent, transparent 23px, var(--grid-line) 23px, var(--grid-line) 24px);
+  line-height: 24px;
+}
+
+@media (max-width: 768px) {
+  .planner-main {
+    grid-template-columns: 1fr;
+  }
+  .planner-paper {
+    padding: 1rem;
+  }
 }

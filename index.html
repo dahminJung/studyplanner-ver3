@@ -1,20 +1,72 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Study Planner</title>
+  <title>Study Planner - Analog Style</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
   <link href='/style.css' rel='stylesheet'>
 </head>
 <body>
-  <div class="app-container">
-    <header>
-      <h1>Study Planner</h1>
-      <p>하루를 계획하고 집중하세요.</p>
-    </header>
-    <main>
-      <study-planner></study-planner>
+  <div class="planner-paper">
+    <div class="planner-header">
+      <div class="date-section">
+        <span class="label">DATE</span>
+        <span class="value">2026. 03. 03. TUE</span>
+      </div>
+      <div class="dday-section">
+        <span class="label">D-DAY</span>
+        <span class="value">100</span>
+      </div>
+    </div>
+
+    <div class="goal-section">
+      <span class="label">DAILY GOAL</span>
+      <div class="goal-input">오늘도 어제보다 나은 나를 위해!</div>
+    </div>
+
+    <main class="planner-main">
+      <!-- To-Do List Section -->
+      <section class="tasks-section">
+        <h3>TASKS</h3>
+        <div class="task-items" id="task-list">
+          <!-- Static items for layout -->
+          ${Array.from({length: 12}, (_, i) => `
+            <div class="task-item">
+              <div class="check-box"></div>
+              <div class="task-text line-grid"></div>
+            </div>
+          `).join('')}
+        </div>
+      </section>
+
+      <!-- 10-Min Timetable Section -->
+      <section class="timetable-section">
+        <h3>TIME TABLE</h3>
+        <div class="timeline-container">
+          <div class="timeline-header">
+            <span></span>
+            <span>10</span><span>20</span><span>30</span><span>40</span><span>50</span>
+          </div>
+          <div class="timeline-grid" id="timeline-grid">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </section>
     </main>
+
+    <footer class="planner-footer">
+      <div class="total-time">
+        <span class="label">TOTAL TIME</span>
+        <span class="value">00:00:00</span>
+      </div>
+      <div class="memo-section">
+        <span class="label">DAILY REFLECTION</span>
+        <div class="memo-area line-grid"></div>
+      </div>
+    </footer>
   </div>
   <script type="module" src="/main.js"></script>
 </body>
