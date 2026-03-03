@@ -3,7 +3,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const subjectPickerGroup = document.getElementById('weekly-subject-picker-group');
   const editBtn = document.getElementById('edit-weekly-btn');
   const saveBtn = document.getElementById('save-weekly-btn');
+  const dateRangeDisplay = document.getElementById('weekly-date-range');
   
+  // 날짜 범위 계산 및 표시
+  const today = new Date();
+  const dayOfWeek = today.getDay(); // 0: Sun, 1: Mon...
+  const diffToMon = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  const monday = new Date(today);
+  monday.setDate(today.getDate() + diffToMon);
+  
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  
+  if (dateRangeDisplay) {
+    const format = (d) => `${d.getMonth() + 1}월 ${d.getDate()}일`;
+    dateRangeDisplay.textContent = `${format(monday)} ~ ${format(sunday)}`;
+  }
+
   let isEditMode = false;
   let weeklyData = JSON.parse(localStorage.getItem('studyPlannerWeekly')) || {};
   

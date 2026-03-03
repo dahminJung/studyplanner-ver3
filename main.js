@@ -6,7 +6,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const countDisplay = document.querySelector('.task-count');
   const subjectSelect = document.getElementById('new-task-subject');
   const titleInput = document.getElementById('new-task-title');
+  const dateDisplay = document.getElementById('current-date-display');
   
+  // 날짜 표시 및 초기화
+  const todayDate = new Date();
+  const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+  if (dateDisplay) {
+    dateDisplay.textContent = todayDate.toLocaleDateString('ko-KR', dateOptions);
+  }
+
   // 기본 설정된 과목 데이터 불러오기
   let subjects = JSON.parse(localStorage.getItem('studyPlannerSubjects')) || [
     { id: 1, name: '수학', color: '#fca5a5' },
@@ -143,9 +151,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // 일일 타임테이블 초기화 및 렌더링
-  const todayDate = new Date();
   const todayDayIdx = (todayDate.getDay() + 6) % 7; // 0: Mon ~ 6: Sun
-  const todayStr = todayDate.toISOString().split('T')[0];
+  const todayStr = todayDate.toLocaleDateString('en-CA'); // YYYY-MM-DD
   
   const weeklyData = JSON.parse(localStorage.getItem('studyPlannerWeekly')) || {};
   let dailyData = JSON.parse(localStorage.getItem('studyPlannerDaily')) || { date: '', blocks: {} };
@@ -168,27 +175,28 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const hoursToRender = 21; 
-  for (let i = 0; i < hoursToRender; i++) {
-    const hour = (6 + i) % 24;
-    const hourRow = document.createElement('div');
-    hourRow.className = 'hour-row';
-    const displayHour = hour.toString().padStart(2, '0');
-    
-    hourRow.innerHTML = `
-      <div class="hour-label">${displayHour}</div>
-      <div class="minutes-blocks">
-        ${[0,10,20,30,40,50].map(m => {
-          const mStr = m.toString().padStart(2, '0');
-          const blockTime = `${displayHour}:${mStr}`;
-          const color = dailyData.blocks[blockTime];
-          return `<div class="min-block" data-time="${blockTime}" ${color ? `style="background-color: ${color};" data-painted-color="${color}"` : ''}></div>`;
-        }).join('')}
-      </div>
-    `;
-    if(timelineGrid) timelineGrid.appendChild(hourRow);
-  }
+  if (timelineGrid) {
+    timelineGrid.innerHTML = '';
+    for (let i = 0; i < hoursToRender; i++) {
+      const hour = (6 + i) % 24;
+      const hourRow = document.createElement('div');
+      hourRow.className = 'hour-row';
+      const displayHour = hour.toString().padStart(2, '0');
+      
+      hourRow.innerHTML = `
+        <div class="hour-label">${displayHour}</div>
+        <div class="minutes-blocks">
+          ${[0,10,20,30,40,50].map(m => {
+            const mStr = m.toString().padStart(2, '0');
+            const blockTime = `${displayHour}:${mStr}`;
+            const color = dailyData.blocks[blockTime];
+            return `<div class="min-block" data-time="${blockTime}" ${color ? `style="background-color: ${color};" data-painted-color="${color}"` : ''}></div>`;
+          }).join('')}
+        </div>
+      `;
+      timelineGrid.appendChild(hourRow);
+    }
 
-  if(timelineGrid) {
     timelineGrid.addEventListener('click', (e) => {
       if (e.target.classList.contains('min-block')) {
         const timeStr = e.target.dataset.time;
