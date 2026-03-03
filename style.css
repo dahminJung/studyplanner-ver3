@@ -1,11 +1,14 @@
 :root {
-  --paper-bg: #fffdfa;
-  --grid-line: #e2e8f0;
-  --accent-pink: #fbcfe8;
-  --accent-blue: #bfdbfe;
-  --text-dark: #374151;
-  --text-muted: #9ca3af;
-  --border-main: #4b5563;
+  --bg-app: #f8fafc;
+  --card-bg: #ffffff;
+  --primary: #4f46e5;
+  --primary-soft: #eef2ff;
+  --accent: #ec4899;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --radius: 12px;
 }
 
 * {
@@ -16,157 +19,155 @@
 
 body {
   font-family: 'Noto Sans KR', sans-serif;
-  background-color: #d1d5db;
-  display: flex;
-  justify-content: center;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  line-height: 1.5;
   padding: 2rem 1rem;
-  color: var(--text-dark);
 }
 
-/* Analog Paper Texture */
-.planner-paper {
-  background-color: var(--paper-bg);
-  width: 100%;
-  max-width: 800px;
-  min-height: 1100px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-  padding: 2rem;
-  position: relative;
-  overflow: hidden;
-  /* Grid pattern background */
-  background-image: 
-    linear-gradient(var(--grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size: 20px 20px;
+.app-wrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-/* Subtle noise effect */
-.planner-paper::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  opacity: 0.03;
-  pointer-events: none;
-  background: url('https://www.transparenttextures.com/patterns/natural-paper.png');
+/* Common Card Style */
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
 }
 
-.label {
-  font-weight: 700;
+.section-label {
   font-size: 0.75rem;
-  color: #fff;
-  background-color: var(--border-main);
-  padding: 2px 8px;
-  border-radius: 2px;
-  letter-spacing: 1px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.05em;
 }
 
-/* Header Section */
-.planner-header {
+/* Header */
+.app-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 1.5rem;
-  border-bottom: 2px solid var(--border-main);
-  padding-bottom: 0.5rem;
-}
-
-.date-section, .dday-section {
-  display: flex;
   align-items: center;
-  gap: 1rem;
 }
 
-.value {
-  font-family: 'Nanum Pen Script', cursive;
-  font-size: 1.5rem;
+.badge {
+  background: var(--text-main);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-right: 0.75rem;
+}
+
+.badge-accent {
+  background: var(--accent);
+}
+
+.header-date, .header-dday {
+  font-weight: 700;
+  font-size: 1.25rem;
 }
 
 /* Goal Section */
-.goal-section {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
+.goal-content input {
+  width: 100%;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--primary);
+  background: var(--primary-soft);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  outline: none;
 }
 
-.goal-input {
-  flex: 1;
-  font-family: 'Nanum Pen Script', cursive;
-  font-size: 1.8rem;
-  border-bottom: 1px solid var(--text-muted);
-  padding: 0.2rem 0.5rem;
-}
-
-/* Main Layout */
-.planner-main {
+/* Main Content Layout */
+.main-layout {
   display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 2rem;
-  margin-bottom: 2rem;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
 }
 
-h3 {
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--bg-app);
+}
+
+.section-header h3 {
   font-size: 1rem;
   font-weight: 700;
-  margin-bottom: 1rem;
-  border-left: 4px solid var(--border-main);
-  padding-left: 0.5rem;
+  color: var(--text-main);
 }
 
 /* Task List */
 .task-items {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0.5rem;
 }
 
 .task-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.75rem;
 }
 
-.check-box {
-  width: 18px;
-  height: 18px;
-  border: 1px solid var(--border-main);
-  border-radius: 50%;
+.task-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
 }
 
-.task-text {
+.task-input {
   flex: 1;
-  height: 24px;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  padding: 4px 0;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
 }
 
-.line-grid {
-  border-bottom: 1px solid var(--grid-line);
+.task-input:focus {
+  border-bottom-color: var(--primary);
 }
 
 /* Time Table */
-.timeline-container {
-  border: 1px solid var(--border-main);
-  background: white;
+.timeline-box {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .timeline-header {
   display: grid;
   grid-template-columns: 40px repeat(5, 1fr);
   font-size: 0.65rem;
+  font-weight: 700;
   text-align: center;
-  border-bottom: 1px solid var(--border-main);
-  background: #f8fafc;
-  padding: 4px 0;
-}
-
-.timeline-grid {
-  display: flex;
-  flex-direction: column;
+  background: var(--bg-app);
+  border-bottom: 1px solid var(--border-color);
+  padding: 6px 0;
+  color: var(--text-muted);
 }
 
 .hour-row {
   display: grid;
   grid-template-columns: 40px 1fr;
-  height: 24px;
-  border-bottom: 1px solid var(--grid-line);
+  height: 28px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .hour-label {
@@ -175,8 +176,8 @@ h3 {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-right: 1px solid var(--border-main);
-  background: #f1f5f9;
+  background: var(--bg-app);
+  border-right: 1px solid var(--border-color);
 }
 
 .minutes-blocks {
@@ -185,56 +186,51 @@ h3 {
 }
 
 .min-block {
-  border-right: 1px dashed var(--grid-line);
+  border-right: 1px solid var(--bg-app);
   cursor: pointer;
+  transition: background 0.2s;
 }
 
-.min-block:last-child {
-  border-right: none;
+.min-block:hover {
+  background-color: var(--primary-soft);
 }
 
 .min-block.filled {
-  background-color: var(--accent-pink);
+  background-color: var(--primary);
 }
 
 /* Footer Section */
-.planner-footer {
-  border-top: 2px solid var(--border-main);
-  padding-top: 1.5rem;
-  display: flex;
-  flex-direction: column;
+.app-footer {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
   gap: 1.5rem;
 }
 
-.total-time {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+.time-display {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  text-align: center;
 }
 
-.total-time .value {
-  font-size: 2rem;
-  font-weight: 700;
-  font-family: 'Noto Sans KR', sans-serif;
+.reflection textarea {
+  width: 100%;
+  min-height: 120px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  outline: none;
 }
 
-.memo-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.memo-area {
-  min-height: 100px;
-  background-image: repeating-linear-gradient(transparent, transparent 23px, var(--grid-line) 23px, var(--grid-line) 24px);
-  line-height: 24px;
+.reflection textarea:focus {
+  border-color: var(--primary);
 }
 
 @media (max-width: 768px) {
-  .planner-main {
+  .main-layout, .app-footer {
     grid-template-columns: 1fr;
-  }
-  .planner-paper {
-    padding: 1rem;
   }
 }
