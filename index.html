@@ -3,12 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
+  <title>Study Planner</title>
   <link href='/style.css' rel='stylesheet'>
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+  <div class="app-container">
+    <header>
+      <h1>Study Planner</h1>
+      <p>Organize your day, stay focused.</p>
+    </header>
+    <main>
+      <study-planner></study-planner>
+    </main>
+  </div>
+  <script type="module" src="/main.js"></script>
 </body>
 </html>
