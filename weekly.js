@@ -150,6 +150,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
       localStorage.setItem('studyPlannerWeekly', JSON.stringify(newData));
+      // Save timestamp to sync with daily
+      localStorage.setItem('studyPlannerWeeklyLastUpdate', Date.now().toString());
       alert('위클리 타임테이블이 저장되었습니다!');
     });
   }

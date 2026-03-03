@@ -156,10 +156,12 @@ document.addEventListener('DOMContentLoaded', () => {
   
   const weeklyData = JSON.parse(localStorage.getItem('studyPlannerWeekly')) || {};
   let dailyData = JSON.parse(localStorage.getItem('studyPlannerDaily')) || { date: '', blocks: {} };
+  const weeklyLastUpdate = parseInt(localStorage.getItem('studyPlannerWeeklyLastUpdate') || '0');
+  const dailyLastSync = parseInt(localStorage.getItem('studyPlannerDailyLastSync') || '0');
 
-  // 날짜가 바뀌었으면 위클리 템플릿으로 오늘 타임테이블 덮어쓰기
-  if (dailyData.date !== todayStr) {
-    dailyData = { date: todayStr, blocks: {} };
+  // 날짜가 바뀌었거나, 위클리 타임테이블이 방금 수정(저장)되었다면 동기화
+  if (dailyData.date !== todayStr || weeklyLastUpdate > dailyLastSync) {
+    dailyData = { date: todayStr, blocks: {} }; // 기존 일일 데이터 덮어쓰기
     for (let hour = 6; hour < 27; hour++) {
       const h = hour % 24;
       const displayHour = h.toString().padStart(2, '0');
@@ -172,6 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
     localStorage.setItem('studyPlannerDaily', JSON.stringify(dailyData));
+    localStorage.setItem('studyPlannerDailyLastSync', Date.now().toString());
   }
 
   const hoursToRender = 21; 
