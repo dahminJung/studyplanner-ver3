@@ -3,9 +3,11 @@ class StudyPlanner extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
     this.tasks = [
-      { id: 1, title: 'Math Study', start: '09:00', end: '11:00', color: '#fef08a' },
-      { id: 2, title: 'English Reading', start: '13:00', end: '14:30', color: '#bbf7d0' }
+      { id: 1, title: '수학 공부', start: '09:00', end: '11:00', color: '#fef08a' },
+      { id: 2, title: '영어 독해', start: '13:00', end: '14:30', color: '#bbf7d0' }
     ];
+    this.startTimeBoundary = 6; // 오전 6시 시작
+    this.endTimeBoundary = 26;  // 익일 오전 2시 종료 (24 + 2)
   }
 
   connectedCallback() {
@@ -28,7 +30,6 @@ class StudyPlanner extends HTMLElement {
         end,
         color
       });
-      // Sort tasks by start time
       this.tasks.sort((a, b) => a.start.localeCompare(b.start));
       this.render();
     }
@@ -135,7 +136,7 @@ class StudyPlanner extends HTMLElement {
 
         .time-slots {
           position: relative;
-          min-height: 1440px; /* 24 hours * 60px */
+          min-height: ${(this.endTimeBoundary - this.startTimeBoundary) * 60}px;
         }
 
         .hour-row {
@@ -149,7 +150,6 @@ class StudyPlanner extends HTMLElement {
           box-sizing: border-box;
         }
         
-        /* Offset text so it aligns with the border line */
         .hour-row span {
           transform: translateY(-50%);
           background: #fafafa;
@@ -207,45 +207,57 @@ class StudyPlanner extends HTMLElement {
       </style>
       
       <div class="panel">
-        <h2>Add Study Task</h2>
+        <h2>공부 일정 추가</h2>
         <form>
           <div class="form-group">
-            <label for="title">Subject / Task</label>
-            <input type="text" id="title" name="title" required placeholder="e.g., Math Study">
+            <label for="title">과목 / 할 일</label>
+            <input type="text" id="title" name="title" required placeholder="예: 수학 공부">
           </div>
           <div class="form-group">
-            <label for="start">Start Time</label>
+            <label for="start">시작 시간</label>
             <input type="time" id="start" name="start" required>
           </div>
           <div class="form-group">
-            <label for="end">End Time</label>
+            <label for="end">종료 시간</label>
             <input type="time" id="end" name="end" required>
           </div>
           <div class="form-group">
-            <label for="color">Color Label</label>
+            <label for="color">색상 라벨</label>
             <input type="color" id="color" name="color" value="#bae6fd">
           </div>
-          <button type="submit">Add to Timetable</button>
+          <button type="submit">시간표에 추가</button>
         </form>
       </div>
 
       <div class="panel">
-        <h2>Daily Timetable</h2>
+        <h2>오늘의 시간표</h2>
         <div class="timetable-container" id="scroll-container">
           <div class="time-slots">
-            ${Array.from({length: 25}, (_, i) => `
-              <div class="hour-row" style="top: ${i * 60}px; position: absolute; width: 100%;">
-                <span>${i.toString().padStart(2, '0')}:00</span>
-              </div>
-            `).join('')}
+            ${Array.from({length: (this.endTimeBoundary - this.startTimeBoundary) + 1}, (_, i) => {
+              const hour = this.startTimeBoundary + i;
+              const displayHour = hour % 24;
+              return `
+                <div class="hour-row" style="top: ${i * 60}px; position: absolute; width: 100%;">
+                  <span>${displayHour.toString().padStart(2, '0')}:00</span>
+                </div>
+              `;
+            }).join('')}
             
             ${this.tasks.map(task => {
               const startParts = task.start.split(':');
               const endParts = task.end.split(':');
-              const startMinutes = parseInt(startParts[0]) * 60 + parseInt(startParts[1]);
-              const endMinutes = parseInt(endParts[0]) * 60 + parseInt(endParts[1]);
-              const top = startMinutes;
+              let startMinutes = parseInt(startParts[0]) * 60 + parseInt(startParts[1]);
+              let endMinutes = parseInt(endParts[0]) * 60 + parseInt(endParts[1]);
+              
+              // 새벽 0시~2시는 24시~26시로 취급하여 계산
+              if (parseInt(startParts[0]) < this.startTimeBoundary) startMinutes += 1440;
+              if (parseInt(endParts[0]) < this.startTimeBoundary || (endMinutes < startMinutes)) endMinutes += 1440;
+
+              const top = startMinutes - (this.startTimeBoundary * 60);
               const height = endMinutes - startMinutes;
+              
+              // 시간표 범위 밖의 일정은 표시하지 않음
+              if (top < 0 || top >= (this.endTimeBoundary - this.startTimeBoundary) * 60) return '';
               
               return `
                 <div class="task-block" style="top: ${top}px; height: ${height}px; background-color: ${task.color};">
@@ -270,17 +282,6 @@ class StudyPlanner extends HTMLElement {
         this.deleteTask(id);
       });
     });
-
-    // Auto-scroll to 8 AM on first load
-    if (!this.scrolled) {
-      setTimeout(() => {
-        const container = this.shadowRoot.getElementById('scroll-container');
-        if (container) {
-          container.scrollTop = 8 * 60 - 20; // Scroll to 8 AM
-          this.scrolled = true;
-        }
-      }, 0);
-    }
   }
 }
 
