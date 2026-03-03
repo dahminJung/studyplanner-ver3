@@ -114,20 +114,92 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Click to paint block with the active color
-    gridBody.addEventListener('click', (e) => {
-      if (!isEditMode) return; // Prevent editing if not in edit mode
+    // Drag to select and color popup logic
+    let isDragging = false;
+    let selectedBlocks = new Set();
 
+    gridBody.addEventListener('mousedown', (e) => {
+      if (!isEditMode) return;
       if (e.target.classList.contains('weekly-min-block')) {
-        if (e.target.dataset.paintedColor === activeColor) {
-          // 이미 같은 색이면 지우기 (Toggle off)
-          e.target.style.backgroundColor = '';
-          delete e.target.dataset.paintedColor;
+        isDragging = true;
+        selectedBlocks.clear();
+        document.querySelectorAll('.dragging-selected').forEach(b => b.classList.remove('dragging-selected'));
+        e.target.classList.add('dragging-selected');
+        selectedBlocks.add(e.target);
+        
+        const existingPopup = document.getElementById('color-popup');
+        if (existingPopup) existingPopup.remove();
+      }
+    });
+
+    gridBody.addEventListener('mouseover', (e) => {
+      if (!isEditMode || !isDragging) return;
+      if (e.target.classList.contains('weekly-min-block')) {
+        e.target.classList.add('dragging-selected');
+        selectedBlocks.add(e.target);
+      }
+    });
+
+    document.addEventListener('mouseup', (e) => {
+      if (!isEditMode || !isDragging) return;
+      isDragging = false;
+      
+      if (selectedBlocks.size > 0) {
+        showColorPopup(e.clientX, e.clientY);
+      }
+    });
+
+    function showColorPopup(x, y) {
+      const existingPopup = document.getElementById('color-popup');
+      if (existingPopup) existingPopup.remove();
+
+      const popup = document.createElement('div');
+      popup.id = 'color-popup';
+      popup.className = 'color-popup';
+      popup.style.left = `${x}px`;
+      popup.style.top = `${y}px`;
+
+      subjects.forEach(subject => {
+        const btn = document.createElement('button');
+        btn.className = 'popup-color-btn';
+        btn.style.backgroundColor = subject.color;
+        btn.title = subject.name;
+        btn.addEventListener('click', () => applyColorToSelection(subject.color));
+        popup.appendChild(btn);
+      });
+
+      const clearBtn = document.createElement('button');
+      clearBtn.className = 'popup-clear-btn';
+      clearBtn.innerHTML = '&times;';
+      clearBtn.title = '지우기';
+      clearBtn.addEventListener('click', () => applyColorToSelection(''));
+      popup.appendChild(clearBtn);
+
+      document.body.appendChild(popup);
+    }
+
+    function applyColorToSelection(color) {
+      selectedBlocks.forEach(block => {
+        if (color) {
+          block.style.backgroundColor = color;
+          block.dataset.paintedColor = color;
         } else {
-          // 다른 색이거나 칠해져있지 않으면 현재 액티브 색상으로 칠하기
-          e.target.style.backgroundColor = activeColor;
-          e.target.dataset.paintedColor = activeColor;
+          block.style.backgroundColor = '';
+          delete block.dataset.paintedColor;
         }
+        block.classList.remove('dragging-selected');
+      });
+      selectedBlocks.clear();
+      const popup = document.getElementById('color-popup');
+      if (popup) popup.remove();
+    }
+
+    document.addEventListener('mousedown', (e) => {
+      const popup = document.getElementById('color-popup');
+      if (popup && !popup.contains(e.target) && !e.target.classList.contains('weekly-min-block')) {
+        popup.remove();
+        document.querySelectorAll('.dragging-selected').forEach(b => b.classList.remove('dragging-selected'));
+        selectedBlocks.clear();
       }
     });
   }
