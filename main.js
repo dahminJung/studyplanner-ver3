@@ -180,6 +180,20 @@ document.addEventListener('DOMContentLoaded', () => {
     gridBody.innerHTML = timeColHTML + dayHTML;
   }
 
+  // D-Day 표시
+  const ddayData = JSON.parse(localStorage.getItem('studyPlannerDday'));
+  const ddayCountEl = document.getElementById('dday-count');
+  const ddayTitleEl = document.getElementById('dday-title');
+  if (ddayData && ddayData.date) {
+    const t = new Date(); t.setHours(0, 0, 0, 0);
+    const target = new Date(ddayData.date); target.setHours(0, 0, 0, 0);
+    const diff = Math.ceil((target - t) / 86400000);
+    if (ddayCountEl) {
+      ddayCountEl.textContent = diff === 0 ? 'D-DAY!' : diff > 0 ? `D-${diff}` : `D+${Math.abs(diff)}`;
+    }
+    if (ddayTitleEl) ddayTitleEl.textContent = ddayData.title;
+  }
+
   // 초기화
   renderSubjectPickers();
   renderTasks();

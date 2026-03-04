@@ -18,8 +18,11 @@
         <span class="header-date" id="current-date-display">로딩 중...</span>
       </div>
       <div class="header-right">
-        <span class="badge badge-accent">D-DAY</span>
-        <span class="header-dday">100</span>
+        <button class="dday-btn" onclick="window.location.href='monthly.html?mode=dday'" title="D-Day 설정">
+          <span class="badge badge-accent">D-DAY</span>
+          <span class="header-dday" id="dday-count">--</span>
+          <span class="dday-label" id="dday-title">설정하기</span>
+        </button>
         <button class="icon-btn" style="margin-left: 0.5rem;" onclick="window.location.href='monthly.html'" title="먼슬리 플래너">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="8" y1="14" x2="8" y2="14"></line><line x1="12" y1="14" x2="12" y2="14"></line><line x1="16" y1="14" x2="16" y2="14"></line>
