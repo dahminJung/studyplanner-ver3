@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveAndRender() {
     localStorage.setItem('studyPlannerSubjects', JSON.stringify(subjects));
     renderSubjects();
+    renderQuickTaskSubjects();
   }
 
   // 과목 추가 이벤트
@@ -82,4 +83,73 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 초기 렌더링
   renderSubjects();
+
+  // ── 자주 사용하는 Task ──────────────────────────────────────
+  const quickTaskTitleInput = document.getElementById('quick-task-title');
+  const quickTaskSubjectSelect = document.getElementById('quick-task-subject');
+  const addQuickTaskBtn = document.getElementById('add-quick-task-btn');
+  const quickTaskList = document.getElementById('quick-task-list');
+
+  let quickTasks = JSON.parse(localStorage.getItem('studyPlannerQuickTasks')) || [];
+
+  function renderQuickTaskSubjects() {
+    if (!quickTaskSubjectSelect) return;
+    const current = quickTaskSubjectSelect.value;
+    quickTaskSubjectSelect.innerHTML = '<option value="" disabled selected>과목 선택</option>';
+    subjects.forEach(s => {
+      const option = document.createElement('option');
+      option.value = s.id;
+      option.textContent = s.name;
+      quickTaskSubjectSelect.appendChild(option);
+    });
+    quickTaskSubjectSelect.value = current;
+  }
+
+  function renderQuickTasks() {
+    if (!quickTaskList) return;
+    quickTaskList.innerHTML = '';
+    if (quickTasks.length === 0) {
+      quickTaskList.innerHTML = '<li class="empty-list">등록된 빠른 Task가 없습니다.</li>';
+      return;
+    }
+    quickTasks.forEach(qt => {
+      const subject = subjects.find(s => s.id === qt.subjectId) || { name: '지정 안됨', color: '#cbd5e1' };
+      const li = document.createElement('li');
+      li.className = 'subject-item';
+      li.innerHTML = `
+        <div class="subject-info">
+          <span class="subject-color-dot" style="background-color: ${subject.color}"></span>
+          <span class="subject-name">${qt.title}</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">${subject.name}</span>
+        </div>
+        <button class="delete-btn" data-qt-id="${qt.id}">&times;</button>
+      `;
+      quickTaskList.appendChild(li);
+    });
+    document.querySelectorAll('[data-qt-id]').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const id = parseInt(e.target.dataset.qtId);
+        quickTasks = quickTasks.filter(qt => qt.id !== id);
+        localStorage.setItem('studyPlannerQuickTasks', JSON.stringify(quickTasks));
+        renderQuickTasks();
+      });
+    });
+  }
+
+  addQuickTaskBtn.addEventListener('click', () => {
+    const title = quickTaskTitleInput.value.trim();
+    const subjectId = parseInt(quickTaskSubjectSelect.value);
+    if (!title || isNaN(subjectId)) {
+      alert('할 일 이름과 과목을 모두 입력/선택해주세요.');
+      return;
+    }
+    quickTasks.push({ id: Date.now(), title, subjectId });
+    quickTaskTitleInput.value = '';
+    quickTaskSubjectSelect.value = '';
+    localStorage.setItem('studyPlannerQuickTasks', JSON.stringify(quickTasks));
+    renderQuickTasks();
+  });
+
+  renderQuickTaskSubjects();
+  renderQuickTasks();
 });

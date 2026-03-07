@@ -52,6 +52,30 @@
         </ul>
       </div>
     </main>
+
+    <section class="card">
+      <div class="section-header" style="margin-bottom: 1.5rem;">
+        <div>
+          <h3>자주 사용하는 Task</h3>
+          <p class="section-desc">자주 추가하는 할 일을 등록해두면 메인 화면에서 빠르게 추가할 수 있습니다.</p>
+        </div>
+      </div>
+
+      <div class="quick-task-form">
+        <input type="text" id="quick-task-title" placeholder="할 일 이름 (예: 수학 문제집 풀기)" class="form-input">
+        <div class="quick-task-form-row">
+          <select id="quick-task-subject" class="task-select">
+            <option value="" disabled selected>과목 선택</option>
+          </select>
+          <button id="add-quick-task-btn" class="primary-btn" style="padding: 0.5rem 1.25rem; white-space: nowrap;">추가</button>
+        </div>
+      </div>
+
+      <div class="subject-list-container" style="margin-top: 1.5rem;">
+        <h4>등록된 빠른 Task</h4>
+        <ul id="quick-task-list" class="subject-list"></ul>
+      </div>
+    </section>
   </div>
   <script type="module" src="/settings.js"></script>
 </body>

@@ -194,7 +194,34 @@ document.addEventListener('DOMContentLoaded', () => {
     if (ddayTitleEl) ddayTitleEl.textContent = ddayData.title;
   }
 
+  // 자주 사용하는 Task 칩 렌더링
+  function renderQuickTaskChips() {
+    const row = document.getElementById('quick-tasks-row');
+    if (!row) return;
+    const quickTasks = JSON.parse(localStorage.getItem('studyPlannerQuickTasks')) || [];
+    row.innerHTML = '';
+    if (quickTasks.length === 0) {
+      row.style.display = 'none';
+      return;
+    }
+    row.style.display = 'flex';
+    quickTasks.forEach(qt => {
+      const subject = subjects.find(s => s.id === qt.subjectId) || { name: '지정 안됨', color: '#cbd5e1' };
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'quick-task-chip';
+      chip.innerHTML = `<span class="quick-task-chip-dot" style="background-color: ${subject.color}"></span>${qt.title}`;
+      chip.title = `${qt.title} (${subject.name}) — 클릭하여 바로 추가`;
+      chip.addEventListener('click', () => {
+        tasks.push({ id: Date.now(), title: qt.title, subjectId: qt.subjectId, completed: false });
+        saveAndRenderTasks();
+      });
+      row.appendChild(chip);
+    });
+  }
+
   // 초기화
   renderSubjectPickers();
   renderTasks();
+  renderQuickTaskChips();
 });

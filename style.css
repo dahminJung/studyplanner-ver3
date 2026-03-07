@@ -902,3 +902,52 @@ body {
   outline-offset: -2px;
 }
 
+/* Quick Tasks (Settings) */
+.quick-task-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.quick-task-form-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Quick Task Chips (Main page) */
+.quick-tasks-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.quick-task-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.7rem;
+  background: var(--bg-app);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-family: inherit;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.quick-task-chip:hover {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+}
+
+.quick-task-chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
