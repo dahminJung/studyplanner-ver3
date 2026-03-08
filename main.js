@@ -110,11 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ─── 즐겨찾기 여부 확인 ───────────────────────────────────
-  function isQuickTask(task) {
-    return quickTasks.some(qt => qt.title === task.title && qt.subjectId === task.subjectId);
-  }
-
   // ─── 할 일 렌더링 ─────────────────────────────────────────
   function renderTasks() {
     if (!taskList) return;
@@ -126,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
       tasks.forEach(task => {
         const subject = subjects.find(s => s.id === task.subjectId) || { name: '지정 안됨', color: '#cbd5e1' };
         const status = task.status || 'pending';
-        const starred = isQuickTask(task);
 
         const item = document.createElement('div');
         item.className = `task-item status-${status}`;
@@ -140,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
             ${task.detail ? `<span class="task-detail-text">${task.detail}</span>` : ''}
           </div>
           <span class="task-subject-badge" style="background-color: ${subject.color}">${subject.name}</span>
-          <button type="button" class="task-star-btn ${starred ? 'starred' : ''}" data-id="${task.id}" title="${starred ? '즐겨찾기 제거' : '즐겨찾기 추가'}">★</button>
           <button type="button" class="task-delete-btn" data-id="${task.id}">&times;</button>
         `;
         taskList.appendChild(item);
@@ -192,22 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
           else if (action === 'fail') task.status = current === 'failed' ? 'pending' : 'failed';
           saveAndRenderTasks();
         }
-      }
-
-      // ⭐ 즐겨찾기 버튼
-      if (e.target.classList.contains('task-star-btn')) {
-        const id = parseInt(e.target.dataset.id);
-        const task = tasks.find(t => t.id === id);
-        if (!task) return;
-        const existingIdx = quickTasks.findIndex(qt => qt.title === task.title && qt.subjectId === task.subjectId);
-        if (existingIdx !== -1) {
-          quickTasks.splice(existingIdx, 1);
-        } else {
-          quickTasks.push({ id: Date.now(), title: task.title, subjectId: task.subjectId, detail: task.detail || '' });
-        }
-        saveQuickTasks();
-        renderTasks();
-        renderQuickTaskChips();
       }
 
       // 삭제 버튼

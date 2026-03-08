@@ -295,27 +295,6 @@ body {
   line-height: 1.4;
 }
 
-/* ⭐ 즐겨찾기 버튼 */
-.task-star-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  color: var(--border-color);
-  padding: 0 2px;
-  transition: color 0.15s, transform 0.15s;
-  flex-shrink: 0;
-}
-
-.task-star-btn:hover {
-  color: #f59e0b;
-  transform: scale(1.2);
-}
-
-.task-star-btn.starred {
-  color: #f59e0b;
-}
-
 /* ─── Quick Task 팝업 ───────────────────────── */
 .qt-popup-overlay {
   position: fixed;
