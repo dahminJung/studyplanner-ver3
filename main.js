@@ -67,8 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ─── 과목 / 할일 / 즐겨찾기 데이터 ──────────────────────
   let subjects = JSON.parse(localStorage.getItem('studyPlannerSubjects')) || [
-    { id: 1, name: '수학', color: '#d4d4d4' },
-    { id: 2, name: '영어', color: '#737373' }
+    { id: 1, name: '수학', color: '#fecaca' },
+    { id: 2, name: '영어', color: '#bfdbfe' }
   ];
   let tasks = JSON.parse(localStorage.getItem('studyPlannerTasks')) || [];
   let quickTasks = JSON.parse(localStorage.getItem('studyPlannerQuickTasks')) || [];

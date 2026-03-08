@@ -38,11 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 기본 설정된 과목 데이터 불러오기
   let subjects = JSON.parse(localStorage.getItem('studyPlannerSubjects')) || [
-    { id: 1, name: '수학', color: '#d4d4d4' },
-    { id: 2, name: '영어', color: '#737373' }
+    { id: 1, name: '수학', color: '#fecaca' },
+    { id: 2, name: '영어', color: '#bfdbfe' }
   ];
 
-  let activeColor = subjects.length > 0 ? subjects[0].color : '#d4d4d4';
+  let activeColor = subjects.length > 0 ? subjects[0].color : '#fecaca';
 
   function renderSubjectPickers() {
     if (!subjectPickerGroup) return;
