@@ -414,6 +414,25 @@ body {
   line-height: 1.4;
 }
 
+/* ─── Study Time ────────────────────────────── */
+.study-time-container { margin-bottom: 1rem; }
+.study-time-list { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.st-row {
+  display: flex; align-items: center; gap: 0.4rem;
+  background: var(--bg-app); border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+}
+.st-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.st-name { font-size: 0.85rem; font-weight: 500; color: var(--text-main); min-width: 3rem; }
+.st-input {
+  width: 3.2rem; text-align: center;
+  border: 1px solid var(--border-color); border-radius: 6px;
+  padding: 0.25rem 0.3rem; font-size: 0.85rem;
+  background: #fff; color: var(--text-main);
+}
+.st-unit { font-size: 0.8rem; color: var(--text-muted); }
+
 /* ─── Quick Task 팝업 ───────────────────────── */
 .qt-popup-overlay {
   position: fixed;

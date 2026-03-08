@@ -9,8 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const dateDisplay = document.getElementById('current-date-display');
   const homeTimeDisplay = document.getElementById('daily-home-time');
   const homeTime2Display = document.getElementById('daily-home-time2');
+  const homeTime3Display = document.getElementById('daily-home-time3');
   const studyroomTimeDisplay = document.getElementById('daily-studyroom-time');
   const studyroomTime2Display = document.getElementById('daily-studyroom-time2');
+  const studyroomTime3Display = document.getElementById('daily-studyroom-time3');
   const todayNoteInput = document.getElementById('daily-today-note');
   const reflectionTextarea = document.getElementById('daily-reflection');
   const memoTextarea = document.getElementById('daily-memo');
@@ -76,10 +78,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (todayTimes.homeTime2) { homeTime2Display.textContent = todayTimes.homeTime2; homeTime2Display.style.display = ''; }
     else homeTime2Display.style.display = 'none';
   }
+  if (homeTime3Display) {
+    if (todayTimes.homeTime3) { homeTime3Display.textContent = todayTimes.homeTime3; homeTime3Display.style.display = ''; }
+    else homeTime3Display.style.display = 'none';
+  }
   if (studyroomTimeDisplay) studyroomTimeDisplay.textContent = todayTimes.studyroomTime || '--:--';
   if (studyroomTime2Display) {
     if (todayTimes.studyroomTime2) { studyroomTime2Display.textContent = todayTimes.studyroomTime2; studyroomTime2Display.style.display = ''; }
     else studyroomTime2Display.style.display = 'none';
+  }
+  if (studyroomTime3Display) {
+    if (todayTimes.studyroomTime3) { studyroomTime3Display.textContent = todayTimes.studyroomTime3; studyroomTime3Display.style.display = ''; }
+    else studyroomTime3Display.style.display = 'none';
   }
 
   if (todayNoteInput) {
@@ -191,17 +201,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const wTimes = JSON.parse(localStorage.getItem('studyPlannerWeeklyTimes') || '{}');
     const todayT = wTimes[todayDayIdx] || {};
     const cfg2 = JSON.parse(localStorage.getItem('studyPlannerNotif') || '{}');
+
+    // 전날 데이터 (history에서 가져오기)
+    const yesterday = new Date(todayDate);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = getDateStr(yesterday);
+    const history = JSON.parse(localStorage.getItem('studyPlannerHistory') || '{}');
+    const prevDayHistory = history[yesterdayStr] || null;
+
     const payload = {
       date: todayStr,
       homeTime: todayT.homeTime || '',
       homeTime2: todayT.homeTime2 || '',
+      homeTime3: todayT.homeTime3 || '',
       studyroomTime: todayT.studyroomTime || '',
       studyroomTime2: todayT.studyroomTime2 || '',
+      studyroomTime3: todayT.studyroomTime3 || '',
       todayNote: localStorage.getItem('studyPlannerTodayNote') || '',
       appUrl: cfg2.appUrl || '',
       tasks: JSON.parse(localStorage.getItem('studyPlannerTasks') || '[]'),
       subjects: JSON.parse(localStorage.getItem('studyPlannerSubjects') || '[]'),
-      dday: ddayRaw
+      dday: ddayRaw,
+      weeklyTimetable: JSON.parse(localStorage.getItem('studyPlannerWeekly') || '{}'),
+      prevDay: prevDayHistory ? { date: yesterdayStr, tasks: prevDayHistory.tasks || [] } : null
     };
 
     try {

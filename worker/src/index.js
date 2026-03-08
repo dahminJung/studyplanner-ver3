@@ -53,9 +53,9 @@ export default {
     // POST /api/sync — 오늘 플랜 동기화
     if (path === '/api/sync' && request.method === 'POST') {
       const body = await request.json();
-      const { date, homeTime, homeTime2, studyroomTime, studyroomTime2, todayNote, tasks, subjects, dday, appUrl } = body;
+      const { date, homeTime, homeTime2, homeTime3, studyroomTime, studyroomTime2, studyroomTime3, todayNote, tasks, subjects, dday, appUrl, weeklyTimetable, prevDay } = body;
       if (!date) return json({ error: 'date 필드가 필요합니다' }, 400);
-      await env.KV.put(`plan:${date}`, JSON.stringify({ homeTime, homeTime2, studyroomTime, studyroomTime2, todayNote, tasks, subjects, dday, appUrl, syncedAt: Date.now() }));
+      await env.KV.put(`plan:${date}`, JSON.stringify({ homeTime, homeTime2, homeTime3, studyroomTime, studyroomTime2, studyroomTime3, todayNote, tasks, subjects, dday, appUrl, weeklyTimetable, prevDay, syncedAt: Date.now() }));
       return json({ ok: true });
     }
 
@@ -99,12 +99,12 @@ function buildMessage(dateStr, plan) {
   let msg = `[스터디플래너] ${dateLabel}\n`;
 
   // 시간 계획
-  if (plan?.homeTime || plan?.homeTime2) {
-    const times = [plan.homeTime, plan.homeTime2].filter(Boolean).join(', ');
+  if (plan?.homeTime || plan?.homeTime2 || plan?.homeTime3) {
+    const times = [plan.homeTime, plan.homeTime2, plan.homeTime3].filter(Boolean).join(', ');
     msg += `\n🏠 집에 오는 시간: ${times}`;
   }
-  if (plan?.studyroomTime || plan?.studyroomTime2) {
-    const times = [plan.studyroomTime, plan.studyroomTime2].filter(Boolean).join(', ');
+  if (plan?.studyroomTime || plan?.studyroomTime2 || plan?.studyroomTime3) {
+    const times = [plan.studyroomTime, plan.studyroomTime2, plan.studyroomTime3].filter(Boolean).join(', ');
     msg += `\n📚 독서실 가는 시간: ${times}`;
   }
   if (plan?.homeTime || plan?.studyroomTime) msg += '\n';
@@ -133,8 +133,70 @@ function buildMessage(dateStr, plan) {
     msg += '\n오늘 할 일을 앱에서 추가해보세요!\n';
   }
 
+  // 타임테이블 기반 과목별 공부 예정 시간
+  const timetable = plan?.weeklyTimetable || {};
+  const subjects2 = plan?.subjects || [];
+  const jsDay = new Date(y, m - 1, d).getDay();
+  const dayIdx = jsDay === 0 ? 6 : jsDay - 1; // 0=Mon~6=Sun
+
+  // 오늘 날짜의 타임테이블 블록만 필터링 후 색상별 시간 집계
+  const colorHours = {};
+  Object.entries(timetable).forEach(([key, color]) => {
+    if (!color) return;
+    const [kDay] = key.split('-');
+    if (parseInt(kDay) !== dayIdx) return;
+    if (isNavyColor(color)) return;
+    colorHours[color] = (colorHours[color] || 0) + 1;
+  });
+
+  // 색상 → 과목명 매핑
+  const timeEntries = Object.entries(colorHours)
+    .map(([color, hours]) => {
+      const subj = subjects2.find(s => s.color === color);
+      const name = subj ? subj.name : null;
+      if (!name) return null;
+      return `${name}: ${hours}시간`;
+    })
+    .filter(Boolean);
+
+  if (timeEntries.length > 0) {
+    msg += `\n⏱ 공부 예정 시간\n${timeEntries.join(', ')}\n`;
+  }
+
+  // 전날 달성률 + 공부 시간
+  const prevTasks = plan?.prevDay?.tasks || [];
+  if (prevTasks.length > 0) {
+    const completed = prevTasks.filter(t => t.status === 'completed').length;
+    const total = prevTasks.length;
+    const rate = Math.round(completed / total * 100);
+    msg += `\n📊 전날 달성률: ${completed}/${total} (${rate}%)`;
+  }
+
+  const timetable2 = plan?.weeklyTimetable || {};
+  const subjects3 = plan?.subjects || [];
+  const prevDate = new Date(y, m - 1, d);
+  prevDate.setDate(prevDate.getDate() - 1);
+  const prevJsDay = prevDate.getDay();
+  const prevDayIdx = prevJsDay === 0 ? 6 : prevJsDay - 1;
+  const prevColorHours = {};
+  Object.entries(timetable2).forEach(([key, color]) => {
+    if (!color) return;
+    const [kDay] = key.split('-');
+    if (parseInt(kDay) !== prevDayIdx) return;
+    if (isNavyColor(color)) return;
+    prevColorHours[color] = (prevColorHours[color] || 0) + 1;
+  });
+  const prevTimeEntries = Object.entries(prevColorHours)
+    .map(([color, hours]) => {
+      const subj = subjects3.find(s => s.color === color);
+      return subj ? `${subj.name}: ${hours}시간` : null;
+    })
+    .filter(Boolean);
+  if (prevTimeEntries.length > 0) {
+    msg += `\n⏱ 전날 공부 시간: ${prevTimeEntries.join(', ')}\n`;
+  }
+
   msg += '\n오늘도 화이팅! 💪';
-  if (plan?.appUrl) msg += `\n\n📱 ${plan.appUrl}`;
   return msg;
 }
 
@@ -183,6 +245,15 @@ async function sendSolapi(env, to, message) {
 
 
 // ─── 헬퍼 ────────────────────────────────────────────────
+function isNavyColor(hex) {
+  if (!hex || !hex.startsWith('#') || hex.length < 7) return false;
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  // 네이비: 파란색 계열이 지배적이고 전체적으로 어두운 색
+  return b > 80 && r < 80 && g < 80 && (r + g + b) < 200;
+}
+
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
