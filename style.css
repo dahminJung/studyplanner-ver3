@@ -853,6 +853,8 @@ body {
   border-radius: 8px;
   overflow: hidden;
   background: var(--card-bg);
+}
+.weekly-timeline-wrapper .weekly-timeline-box {
   min-width: 560px;
 }
 .weekly-header-row {
