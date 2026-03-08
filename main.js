@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const subjectSelect = document.getElementById('new-task-subject');
   const titleInput = document.getElementById('new-task-title');
   const dateDisplay = document.getElementById('current-date-display');
-  const homeTimeInput = document.getElementById('daily-home-time');
-  const studyroomTimeInput = document.getElementById('daily-studyroom-time');
+  const homeTimeDisplay = document.getElementById('daily-home-time');
+  const studyroomTimeDisplay = document.getElementById('daily-studyroom-time');
   const todayNoteInput = document.getElementById('daily-today-note');
   const reflectionTextarea = document.getElementById('daily-reflection');
   const memoTextarea = document.getElementById('daily-memo');
@@ -30,9 +30,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const lastDateStr = localStorage.getItem('studyPlannerLastDate');
   if (lastDateStr && lastDateStr !== todayStr) {
     const history = JSON.parse(localStorage.getItem('studyPlannerHistory')) || {};
+    const prevDate = new Date(lastDateStr);
+    const prevDayIdx = prevDate.getDay() === 0 ? 6 : prevDate.getDay() - 1;
+    const prevWeeklyTimes = JSON.parse(localStorage.getItem('studyPlannerWeeklyTimes') || '{}');
+    const prevTimes = prevWeeklyTimes[prevDayIdx] || {};
     history[lastDateStr] = {
-      homeTime: localStorage.getItem('studyPlannerHomeTime') || '',
-      studyroomTime: localStorage.getItem('studyPlannerStudyroomTime') || '',
+      homeTime: prevTimes.homeTime || '',
+      studyroomTime: prevTimes.studyroomTime || '',
       todayNote: localStorage.getItem('studyPlannerTodayNote') || '',
       tasks: JSON.parse(localStorage.getItem('studyPlannerTasks')) || [],
       reflection: localStorage.getItem('studyPlannerDailyReflection') || '',
@@ -60,21 +64,12 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('studyPlannerQuickTasks', JSON.stringify(quickTasks));
   }
 
-  // ─── Daily Plan 저장/불러오기 ────────────────────────────
-  if (homeTimeInput) {
-    homeTimeInput.value = localStorage.getItem('studyPlannerHomeTime') || '';
-    homeTimeInput.addEventListener('change', () => {
-      localStorage.setItem('studyPlannerHomeTime', homeTimeInput.value);
-      syncPlanToWorker();
-    });
-  }
-  if (studyroomTimeInput) {
-    studyroomTimeInput.value = localStorage.getItem('studyPlannerStudyroomTime') || '';
-    studyroomTimeInput.addEventListener('change', () => {
-      localStorage.setItem('studyPlannerStudyroomTime', studyroomTimeInput.value);
-      syncPlanToWorker();
-    });
-  }
+  // ─── 위클리 시간 설정에서 오늘 시간 표시 ────────────────
+  const weeklyTimes = JSON.parse(localStorage.getItem('studyPlannerWeeklyTimes') || '{}');
+  const todayTimes = weeklyTimes[todayDayIdx] || {};
+  if (homeTimeDisplay) homeTimeDisplay.textContent = todayTimes.homeTime || '--:--';
+  if (studyroomTimeDisplay) studyroomTimeDisplay.textContent = todayTimes.studyroomTime || '--:--';
+
   if (todayNoteInput) {
     todayNoteInput.value = localStorage.getItem('studyPlannerTodayNote') || '';
     todayNoteInput.addEventListener('input', () => {
@@ -181,11 +176,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!cfg.workerUrl || !cfg.apiKey || !cfg.active) return;
 
     const ddayRaw = JSON.parse(localStorage.getItem('studyPlannerDday') || 'null');
+    const wTimes = JSON.parse(localStorage.getItem('studyPlannerWeeklyTimes') || '{}');
+    const todayT = wTimes[todayDayIdx] || {};
+    const cfg2 = JSON.parse(localStorage.getItem('studyPlannerNotif') || '{}');
     const payload = {
       date: todayStr,
-      homeTime: localStorage.getItem('studyPlannerHomeTime') || '',
-      studyroomTime: localStorage.getItem('studyPlannerStudyroomTime') || '',
+      homeTime: todayT.homeTime || '',
+      studyroomTime: todayT.studyroomTime || '',
       todayNote: localStorage.getItem('studyPlannerTodayNote') || '',
+      appUrl: cfg2.appUrl || '',
       tasks: JSON.parse(localStorage.getItem('studyPlannerTasks') || '[]'),
       subjects: JSON.parse(localStorage.getItem('studyPlannerSubjects') || '[]'),
       dday: ddayRaw

@@ -210,6 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const workerUrlInput = document.getElementById('notif-worker-url');
   const apiKeyInput = document.getElementById('notif-api-key');
   const phoneInput = document.getElementById('notif-phone');
+  const appUrlInput = document.getElementById('notif-app-url');
   const saveBtn = document.getElementById('notif-save-btn');
   const testBtn = document.getElementById('notif-test-btn');
   const notifMsg = document.getElementById('notif-msg');
@@ -220,6 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (workerUrlInput && notifConfig.workerUrl) workerUrlInput.value = notifConfig.workerUrl;
   if (apiKeyInput && notifConfig.apiKey) apiKeyInput.value = notifConfig.apiKey;
   if (phoneInput && notifConfig.phone) phoneInput.value = notifConfig.phone;
+  if (appUrlInput && notifConfig.appUrl) appUrlInput.value = notifConfig.appUrl;
   updateStatusBadge();
 
   function updateStatusBadge() {
@@ -284,7 +286,8 @@ document.addEventListener('DOMContentLoaded', () => {
           body: JSON.stringify({ phone })
         });
         if (!res.ok) throw new Error(`서버 오류 ${res.status}`);
-        localStorage.setItem('studyPlannerNotif', JSON.stringify({ workerUrl: url, apiKey: key, phone, active: true }));
+        const appUrl = appUrlInput ? appUrlInput.value.trim() : '';
+        localStorage.setItem('studyPlannerNotif', JSON.stringify({ workerUrl: url, apiKey: key, phone, appUrl, active: true }));
         updateStatusBadge();
         showMsg('저장 완료! 매일 오전 8시에 SMS를 받게 됩니다.');
       } catch (err) {

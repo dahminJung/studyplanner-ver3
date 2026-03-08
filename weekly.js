@@ -240,4 +240,44 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('위클리 타임테이블이 저장되었습니다!');
     });
   }
+
+  // ─── 요일별 시간 설정 ────────────────────────────────────
+  const timesGrid = document.getElementById('weekly-times-grid');
+  const dayNames = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+  const dayLabels = ['월', '화', '수', '목', '금', '토', '일'];
+  let weeklyTimes = JSON.parse(localStorage.getItem('studyPlannerWeeklyTimes') || '{}');
+
+  function renderTimesGrid() {
+    if (!timesGrid) return;
+    timesGrid.innerHTML = '';
+    for (let d = 0; d < 7; d++) {
+      const t = weeklyTimes[d] || {};
+      const col = document.createElement('div');
+      col.className = 'wt-col';
+      col.innerHTML = `
+        <div class="wt-day-label ${d === 5 ? 'sat' : d === 6 ? 'sun' : ''}">${dayLabels[d]}</div>
+        <div class="wt-row">
+          <span class="wt-icon">🏠</span>
+          <input type="time" class="wt-input" data-day="${d}" data-type="homeTime" value="${t.homeTime || ''}">
+        </div>
+        <div class="wt-row">
+          <span class="wt-icon">📚</span>
+          <input type="time" class="wt-input" data-day="${d}" data-type="studyroomTime" value="${t.studyroomTime || ''}">
+        </div>
+      `;
+      timesGrid.appendChild(col);
+    }
+
+    timesGrid.querySelectorAll('.wt-input').forEach(input => {
+      input.addEventListener('change', () => {
+        const day = input.dataset.day;
+        const type = input.dataset.type;
+        if (!weeklyTimes[day]) weeklyTimes[day] = {};
+        weeklyTimes[day][type] = input.value;
+        localStorage.setItem('studyPlannerWeeklyTimes', JSON.stringify(weeklyTimes));
+      });
+    });
+  }
+
+  renderTimesGrid();
 });

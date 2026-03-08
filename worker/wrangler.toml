@@ -6,7 +6,7 @@ compatibility_date = "2024-09-23"
 # 배포 전: wrangler kv:namespace create "KV" 실행 후 id 붙여넣기
 [[kv_namespaces]]
 binding = "KV"
-id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+id = "d2c37912880940b08872aa4520deec7f"
 
 # 매일 23:00 UTC = 한국 시간 08:00 KST
 [triggers]

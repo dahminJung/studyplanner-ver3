@@ -53,9 +53,9 @@ export default {
     // POST /api/sync — 오늘 플랜 동기화
     if (path === '/api/sync' && request.method === 'POST') {
       const body = await request.json();
-      const { date, homeTime, studyroomTime, todayNote, tasks, subjects, dday } = body;
+      const { date, homeTime, studyroomTime, todayNote, tasks, subjects, dday, appUrl } = body;
       if (!date) return json({ error: 'date 필드가 필요합니다' }, 400);
-      await env.KV.put(`plan:${date}`, JSON.stringify({ homeTime, studyroomTime, todayNote, tasks, subjects, dday, syncedAt: Date.now() }));
+      await env.KV.put(`plan:${date}`, JSON.stringify({ homeTime, studyroomTime, todayNote, tasks, subjects, dday, appUrl, syncedAt: Date.now() }));
       return json({ ok: true });
     }
 
@@ -133,6 +133,7 @@ function buildMessage(dateStr, plan) {
   }
 
   msg += '\n오늘도 화이팅! 💪';
+  if (plan?.appUrl) msg += `\n\n📱 ${plan.appUrl}`;
   return msg;
 }
 
