@@ -136,24 +136,16 @@ function buildMessage(dateStr, plan) {
   return msg;
 }
 
-// ─── SMS 발송 (CoolSMS / Twilio) ─────────────────────────
+// ─── SMS 발송 (Solapi) ───────────────────────────────────
 async function sendSMS(env, to, message) {
-  const provider = (env.SMS_PROVIDER || 'coolsms').toLowerCase();
-
-  if (provider === 'coolsms') {
-    return sendCoolSMS(env, to, message);
-  } else if (provider === 'twilio') {
-    return sendTwilio(env, to, message);
-  } else {
-    throw new Error(`알 수 없는 SMS_PROVIDER: ${provider}`);
-  }
+  return sendSolapi(env, to, message);
 }
 
-// CoolSMS (한국 번호 권장)
-async function sendCoolSMS(env, to, message) {
-  const apiKey = env.COOLSMS_API_KEY;
-  const apiSecret = env.COOLSMS_API_SECRET;
-  const from = env.COOLSMS_FROM;
+// Solapi (구 CoolSMS) — https://console.solapi.com
+async function sendSolapi(env, to, message) {
+  const apiKey = env.SOLAPI_API_KEY;
+  const apiSecret = env.SOLAPI_API_SECRET;
+  const from = env.SOLAPI_FROM;
 
   // HMAC-SHA256 서명 생성
   const date = new Date().toISOString();
@@ -170,7 +162,7 @@ async function sendCoolSMS(env, to, message) {
   const sigBuffer = await crypto.subtle.sign('HMAC', keyBuffer, new TextEncoder().encode(sigData));
   const signature = Array.from(new Uint8Array(sigBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 
-  const res = await fetch('https://api.coolsms.co.kr/messages/v4/send', {
+  const res = await fetch('https://api.solapi.com/messages/v4/send', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -183,34 +175,10 @@ async function sendCoolSMS(env, to, message) {
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`CoolSMS 오류: ${res.status} ${err}`);
+    throw new Error(`Solapi 오류: ${res.status} ${err}`);
   }
 }
 
-// Twilio (해외 번호 또는 대안)
-async function sendTwilio(env, to, message) {
-  const accountSid = env.TWILIO_ACCOUNT_SID;
-  const authToken = env.TWILIO_AUTH_TOKEN;
-  const from = env.TWILIO_FROM;
-
-  const credentials = btoa(`${accountSid}:${authToken}`);
-  const res = await fetch(
-    `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-    {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${credentials}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({ To: to, From: from, Body: message })
-    }
-  );
-
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Twilio 오류: ${res.status} ${err}`);
-  }
-}
 
 // ─── 헬퍼 ────────────────────────────────────────────────
 function json(data, status = 200) {
