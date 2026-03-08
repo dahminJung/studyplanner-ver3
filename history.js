@@ -129,10 +129,14 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
 
-        ${entry.goal ? `
+        ${(entry.homeTime || entry.studyroomTime || entry.todayNote) ? `
         <div class="history-section">
-          <div class="history-section-label">DAILY GOAL</div>
-          <div class="history-goal-text">${entry.goal}</div>
+          <div class="history-section-label">DAILY PLAN</div>
+          <div class="history-daily-plan">
+            ${entry.homeTime ? `<div class="history-plan-row"><span class="history-plan-icon">🏠</span><span>집에 오는 시간</span><strong>${entry.homeTime}</strong></div>` : ''}
+            ${entry.studyroomTime ? `<div class="history-plan-row"><span class="history-plan-icon">📚</span><span>독서실 가는 시간</span><strong>${entry.studyroomTime}</strong></div>` : ''}
+            ${entry.todayNote ? `<div class="history-plan-note">${entry.todayNote}</div>` : ''}
+          </div>
         </div>` : ''}
 
         <div class="history-section">

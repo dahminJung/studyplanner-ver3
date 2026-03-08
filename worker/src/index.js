@@ -53,9 +53,9 @@ export default {
     // POST /api/sync — 오늘 플랜 동기화
     if (path === '/api/sync' && request.method === 'POST') {
       const body = await request.json();
-      const { date, goal, tasks, subjects, dday } = body;
+      const { date, homeTime, studyroomTime, todayNote, tasks, subjects, dday } = body;
       if (!date) return json({ error: 'date 필드가 필요합니다' }, 400);
-      await env.KV.put(`plan:${date}`, JSON.stringify({ goal, tasks, subjects, dday, syncedAt: Date.now() }));
+      await env.KV.put(`plan:${date}`, JSON.stringify({ homeTime, studyroomTime, todayNote, tasks, subjects, dday, syncedAt: Date.now() }));
       return json({ ok: true });
     }
 
@@ -98,9 +98,14 @@ function buildMessage(dateStr, plan) {
 
   let msg = `[스터디플래너] ${dateLabel}\n`;
 
-  // 다짐
-  if (plan?.goal) {
-    msg += `\n📌 오늘의 다짐\n${plan.goal}\n`;
+  // 시간 계획
+  if (plan?.homeTime) msg += `\n🏠 집에 오는 시간: ${plan.homeTime}`;
+  if (plan?.studyroomTime) msg += `\n📚 독서실 가는 시간: ${plan.studyroomTime}`;
+  if (plan?.homeTime || plan?.studyroomTime) msg += '\n';
+
+  // 오늘 할 일 메모
+  if (plan?.todayNote) {
+    msg += `\n📝 오늘 할 일\n${plan.todayNote}\n`;
   }
 
   // D-Day

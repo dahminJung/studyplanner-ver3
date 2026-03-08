@@ -7,7 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const subjectSelect = document.getElementById('new-task-subject');
   const titleInput = document.getElementById('new-task-title');
   const dateDisplay = document.getElementById('current-date-display');
-  const goalInput = document.querySelector('.goal-content input');
+  const homeTimeInput = document.getElementById('daily-home-time');
+  const studyroomTimeInput = document.getElementById('daily-studyroom-time');
+  const todayNoteInput = document.getElementById('daily-today-note');
   const reflectionTextarea = document.getElementById('daily-reflection');
   const memoTextarea = document.getElementById('daily-memo');
 
@@ -29,14 +31,18 @@ document.addEventListener('DOMContentLoaded', () => {
   if (lastDateStr && lastDateStr !== todayStr) {
     const history = JSON.parse(localStorage.getItem('studyPlannerHistory')) || {};
     history[lastDateStr] = {
-      goal: localStorage.getItem('studyPlannerDailyGoal') || '',
+      homeTime: localStorage.getItem('studyPlannerHomeTime') || '',
+      studyroomTime: localStorage.getItem('studyPlannerStudyroomTime') || '',
+      todayNote: localStorage.getItem('studyPlannerTodayNote') || '',
       tasks: JSON.parse(localStorage.getItem('studyPlannerTasks')) || [],
       reflection: localStorage.getItem('studyPlannerDailyReflection') || '',
       memo: localStorage.getItem('studyPlannerDailyMemo') || ''
     };
     localStorage.setItem('studyPlannerHistory', JSON.stringify(history));
     localStorage.removeItem('studyPlannerTasks');
-    localStorage.removeItem('studyPlannerDailyGoal');
+    localStorage.removeItem('studyPlannerHomeTime');
+    localStorage.removeItem('studyPlannerStudyroomTime');
+    localStorage.removeItem('studyPlannerTodayNote');
     localStorage.removeItem('studyPlannerDailyReflection');
     localStorage.removeItem('studyPlannerDailyMemo');
   }
@@ -54,12 +60,25 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('studyPlannerQuickTasks', JSON.stringify(quickTasks));
   }
 
-  // ─── Goal 저장/불러오기 ───────────────────────────────────
-  if (goalInput) {
-    const savedGoal = localStorage.getItem('studyPlannerDailyGoal');
-    goalInput.value = savedGoal !== null ? savedGoal : '오늘도 어제보다 나은 나를 위해!';
-    goalInput.addEventListener('input', () => {
-      localStorage.setItem('studyPlannerDailyGoal', goalInput.value);
+  // ─── Daily Plan 저장/불러오기 ────────────────────────────
+  if (homeTimeInput) {
+    homeTimeInput.value = localStorage.getItem('studyPlannerHomeTime') || '';
+    homeTimeInput.addEventListener('change', () => {
+      localStorage.setItem('studyPlannerHomeTime', homeTimeInput.value);
+      syncPlanToWorker();
+    });
+  }
+  if (studyroomTimeInput) {
+    studyroomTimeInput.value = localStorage.getItem('studyPlannerStudyroomTime') || '';
+    studyroomTimeInput.addEventListener('change', () => {
+      localStorage.setItem('studyPlannerStudyroomTime', studyroomTimeInput.value);
+      syncPlanToWorker();
+    });
+  }
+  if (todayNoteInput) {
+    todayNoteInput.value = localStorage.getItem('studyPlannerTodayNote') || '';
+    todayNoteInput.addEventListener('input', () => {
+      localStorage.setItem('studyPlannerTodayNote', todayNoteInput.value);
       syncPlanToWorker();
     });
   }
@@ -164,7 +183,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const ddayRaw = JSON.parse(localStorage.getItem('studyPlannerDday') || 'null');
     const payload = {
       date: todayStr,
-      goal: localStorage.getItem('studyPlannerDailyGoal') || '',
+      homeTime: localStorage.getItem('studyPlannerHomeTime') || '',
+      studyroomTime: localStorage.getItem('studyPlannerStudyroomTime') || '',
+      todayNote: localStorage.getItem('studyPlannerTodayNote') || '',
       tasks: JSON.parse(localStorage.getItem('studyPlannerTasks') || '[]'),
       subjects: JSON.parse(localStorage.getItem('studyPlannerSubjects') || '[]'),
       dday: ddayRaw

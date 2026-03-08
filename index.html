@@ -47,11 +47,22 @@
       </div>
     </header>
 
-    <!-- Goal Section -->
-    <section class="goal-container card">
-      <div class="section-label">DAILY GOAL</div>
-      <div class="goal-content">
-        <input type="text" placeholder="오늘의 다짐을 적어보세요." value="오늘도 어제보다 나은 나를 위해!">
+    <!-- Daily Plan Section -->
+    <section class="daily-plan-container card">
+      <div class="section-label">DAILY PLAN</div>
+      <div class="daily-plan-grid">
+        <div class="daily-plan-row">
+          <label class="daily-plan-label">집에 오는 시간</label>
+          <input type="time" id="daily-home-time" class="daily-plan-time-input">
+        </div>
+        <div class="daily-plan-row">
+          <label class="daily-plan-label">독서실 가는 시간</label>
+          <input type="time" id="daily-studyroom-time" class="daily-plan-time-input">
+        </div>
+        <div class="daily-plan-row daily-plan-row-full">
+          <label class="daily-plan-label">오늘 할 일</label>
+          <textarea id="daily-today-note" class="daily-plan-note" placeholder="오늘 해야 할 일을 간단히 메모하세요." rows="2"></textarea>
+        </div>
       </div>
     </section>
 
