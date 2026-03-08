@@ -205,4 +205,94 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderQuickTaskSubjects();
   renderQuickTasks();
+
+  // ── 알림 설정 ────────────────────────────────────────────
+  const workerUrlInput = document.getElementById('notif-worker-url');
+  const apiKeyInput = document.getElementById('notif-api-key');
+  const phoneInput = document.getElementById('notif-phone');
+  const saveBtn = document.getElementById('notif-save-btn');
+  const testBtn = document.getElementById('notif-test-btn');
+  const notifMsg = document.getElementById('notif-msg');
+  const statusBadge = document.getElementById('notif-status-badge');
+
+  // 저장된 설정 불러오기
+  const notifConfig = JSON.parse(localStorage.getItem('studyPlannerNotif') || '{}');
+  if (workerUrlInput && notifConfig.workerUrl) workerUrlInput.value = notifConfig.workerUrl;
+  if (apiKeyInput && notifConfig.apiKey) apiKeyInput.value = notifConfig.apiKey;
+  if (phoneInput && notifConfig.phone) phoneInput.value = notifConfig.phone;
+  updateStatusBadge();
+
+  function updateStatusBadge() {
+    if (!statusBadge) return;
+    const cfg = JSON.parse(localStorage.getItem('studyPlannerNotif') || '{}');
+    if (cfg.workerUrl && cfg.phone && cfg.active) {
+      statusBadge.textContent = '활성';
+      statusBadge.className = 'notif-status-badge active';
+    } else {
+      statusBadge.textContent = '미설정';
+      statusBadge.className = 'notif-status-badge';
+    }
+  }
+
+  function showMsg(text, isError = false) {
+    if (!notifMsg) return;
+    notifMsg.textContent = text;
+    notifMsg.style.display = 'block';
+    notifMsg.className = `notif-msg ${isError ? 'error' : 'success'}`;
+    setTimeout(() => { notifMsg.style.display = 'none'; }, 4000);
+  }
+
+  if (testBtn) {
+    testBtn.addEventListener('click', async () => {
+      const url = workerUrlInput.value.trim();
+      const key = apiKeyInput.value.trim();
+      if (!url) { showMsg('Worker URL을 입력해주세요.', true); return; }
+      testBtn.disabled = true;
+      testBtn.textContent = '확인 중...';
+      try {
+        const res = await fetch(`${url}/api/status`);
+        const data = await res.json();
+        showMsg(data.message || '연결 성공!');
+      } catch {
+        showMsg('연결 실패: Worker URL을 확인해주세요.', true);
+      } finally {
+        testBtn.disabled = false;
+        testBtn.textContent = '연결 테스트';
+      }
+    });
+  }
+
+  if (saveBtn) {
+    saveBtn.addEventListener('click', async () => {
+      const url = workerUrlInput.value.trim();
+      const key = apiKeyInput.value.trim();
+      const phone = phoneInput.value.trim().replace(/[-\s]/g, '');
+      if (!url || !key || !phone) {
+        showMsg('모든 항목을 입력해주세요.', true);
+        return;
+      }
+      if (!/^0\d{9,10}$/.test(phone)) {
+        showMsg('올바른 전화번호 형식이 아닙니다. (예: 01012345678)', true);
+        return;
+      }
+      saveBtn.disabled = true;
+      saveBtn.textContent = '저장 중...';
+      try {
+        const res = await fetch(`${url}/api/phone`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-API-Key': key },
+          body: JSON.stringify({ phone })
+        });
+        if (!res.ok) throw new Error(`서버 오류 ${res.status}`);
+        localStorage.setItem('studyPlannerNotif', JSON.stringify({ workerUrl: url, apiKey: key, phone, active: true }));
+        updateStatusBadge();
+        showMsg('저장 완료! 매일 오전 8시에 SMS를 받게 됩니다.');
+      } catch (err) {
+        showMsg(`저장 실패: ${err.message}`, true);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = '저장 & 활성화';
+      }
+    });
+  }
 });

@@ -1,0 +1,22 @@
+name = "studyplanner-worker"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+# Cloudflare KV 바인딩 — 배포 후 wrangler kv:namespace create "KV" 명령으로 id 획득
+[[kv_namespaces]]
+binding = "KV"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+# 매일 23:00 UTC = 한국 시간 08:00 KST에 SMS 발송
+[triggers]
+crons = ["0 23 * * *"]
+
+# 환경변수는 아래 명령으로 secret 등록:
+# wrangler secret put API_KEY
+# wrangler secret put SMS_PROVIDER        (coolsms 또는 twilio)
+# wrangler secret put COOLSMS_API_KEY     (CoolSMS 사용 시)
+# wrangler secret put COOLSMS_API_SECRET  (CoolSMS 사용 시)
+# wrangler secret put COOLSMS_FROM        (발신번호, 예: 01012345678)
+# wrangler secret put TWILIO_ACCOUNT_SID  (Twilio 사용 시)
+# wrangler secret put TWILIO_AUTH_TOKEN   (Twilio 사용 시)
+# wrangler secret put TWILIO_FROM         (Twilio 발신번호, 예: +821012345678)

@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     goalInput.value = savedGoal !== null ? savedGoal : '오늘도 어제보다 나은 나를 위해!';
     goalInput.addEventListener('input', () => {
       localStorage.setItem('studyPlannerDailyGoal', goalInput.value);
+      syncPlanToWorker();
     });
   }
 
@@ -152,6 +153,32 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('studyPlannerTasks', JSON.stringify(tasks));
     renderTasks();
     renderQuickTaskChips();
+    syncPlanToWorker();
+  }
+
+  // ─── Worker로 플랜 동기화 ────────────────────────────────
+  async function syncPlanToWorker() {
+    const cfg = JSON.parse(localStorage.getItem('studyPlannerNotif') || '{}');
+    if (!cfg.workerUrl || !cfg.apiKey || !cfg.active) return;
+
+    const ddayRaw = JSON.parse(localStorage.getItem('studyPlannerDday') || 'null');
+    const payload = {
+      date: todayStr,
+      goal: localStorage.getItem('studyPlannerDailyGoal') || '',
+      tasks: JSON.parse(localStorage.getItem('studyPlannerTasks') || '[]'),
+      subjects: JSON.parse(localStorage.getItem('studyPlannerSubjects') || '[]'),
+      dday: ddayRaw
+    };
+
+    try {
+      await fetch(`${cfg.workerUrl}/api/sync`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-API-Key': cfg.apiKey },
+        body: JSON.stringify(payload)
+      });
+    } catch {
+      // 네트워크 오류 시 조용히 무시 (앱 사용에 영향 없도록)
+    }
   }
 
   // ─── Task 폼 제출 ─────────────────────────────────────────
@@ -326,4 +353,5 @@ document.addEventListener('DOMContentLoaded', () => {
   renderSubjectPickers();
   renderTasks();
   renderQuickTaskChips();
+  syncPlanToWorker(); // 앱 열 때 최신 플랜 동기화
 });

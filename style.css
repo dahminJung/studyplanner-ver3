@@ -1181,6 +1181,109 @@ body {
 }
 
 /* ================================
+   Notification Settings
+   ================================ */
+
+.notif-status-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--border-color);
+  color: var(--text-muted);
+}
+
+.notif-status-badge.active {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.notif-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.notif-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.notif-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+}
+
+.notif-btn-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.notif-secondary-btn {
+  background: var(--bg-app);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.notif-secondary-btn:hover {
+  background: var(--border-color);
+}
+
+.notif-msg {
+  font-size: 0.88rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.notif-msg.success {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.notif-msg.error {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.notif-guide {
+  padding: 1rem 1.25rem;
+}
+
+.notif-guide-list {
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  color: var(--text-main);
+  line-height: 1.6;
+}
+
+.notif-code {
+  background: var(--text-main);
+  color: #e2e8f0;
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  margin-top: 0.35rem;
+  overflow-x: auto;
+  white-space: pre;
+  font-family: 'Courier New', monospace;
+}
+
+/* ================================
    History Page
    ================================ */
 
