@@ -10,9 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const homeTimeDisplay = document.getElementById('daily-home-time');
   const homeTime2Display = document.getElementById('daily-home-time2');
   const homeTime3Display = document.getElementById('daily-home-time3');
+  const homeTime4Display = document.getElementById('daily-home-time4');
   const studyroomTimeDisplay = document.getElementById('daily-studyroom-time');
   const studyroomTime2Display = document.getElementById('daily-studyroom-time2');
   const studyroomTime3Display = document.getElementById('daily-studyroom-time3');
+  const studyroomTime4Display = document.getElementById('daily-studyroom-time4');
   const todayNoteInput = document.getElementById('daily-today-note');
   const reflectionTextarea = document.getElementById('daily-reflection');
   const memoTextarea = document.getElementById('daily-memo');
@@ -82,6 +84,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (todayTimes.homeTime3) { homeTime3Display.textContent = todayTimes.homeTime3; homeTime3Display.style.display = ''; }
     else homeTime3Display.style.display = 'none';
   }
+  if (homeTime4Display) {
+    if (todayTimes.homeTime4) { homeTime4Display.textContent = todayTimes.homeTime4; homeTime4Display.style.display = ''; }
+    else homeTime4Display.style.display = 'none';
+  }
   if (studyroomTimeDisplay) studyroomTimeDisplay.textContent = todayTimes.studyroomTime || '--:--';
   if (studyroomTime2Display) {
     if (todayTimes.studyroomTime2) { studyroomTime2Display.textContent = todayTimes.studyroomTime2; studyroomTime2Display.style.display = ''; }
@@ -90,6 +96,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (studyroomTime3Display) {
     if (todayTimes.studyroomTime3) { studyroomTime3Display.textContent = todayTimes.studyroomTime3; studyroomTime3Display.style.display = ''; }
     else studyroomTime3Display.style.display = 'none';
+  }
+  if (studyroomTime4Display) {
+    if (todayTimes.studyroomTime4) { studyroomTime4Display.textContent = todayTimes.studyroomTime4; studyroomTime4Display.style.display = ''; }
+    else studyroomTime4Display.style.display = 'none';
   }
 
   if (todayNoteInput) {
@@ -214,9 +224,11 @@ document.addEventListener('DOMContentLoaded', () => {
       homeTime: todayT.homeTime || '',
       homeTime2: todayT.homeTime2 || '',
       homeTime3: todayT.homeTime3 || '',
+      homeTime4: todayT.homeTime4 || '',
       studyroomTime: todayT.studyroomTime || '',
       studyroomTime2: todayT.studyroomTime2 || '',
       studyroomTime3: todayT.studyroomTime3 || '',
+      studyroomTime4: todayT.studyroomTime4 || '',
       todayNote: localStorage.getItem('studyPlannerTodayNote') || '',
       appUrl: cfg2.appUrl || '',
       tasks: JSON.parse(localStorage.getItem('studyPlannerTasks') || '[]'),

@@ -254,20 +254,22 @@ document.addEventListener('DOMContentLoaded', () => {
       const t = weeklyTimes[d] || {};
       const col = document.createElement('div');
       col.className = 'wt-col';
-      const isWeekend = d === 5 || d === 6;
+      const extraSlots = d === 5 ? 2 : d === 6 ? 1 : 0;
       col.innerHTML = `
         <div class="wt-day-label ${d === 5 ? 'sat' : d === 6 ? 'sun' : ''}">${dayLabels[d]}</div>
         <div class="wt-row">
           <span class="wt-icon">🏠</span>
           <input type="time" class="wt-input" data-day="${d}" data-type="homeTime" value="${t.homeTime || ''}">
           <input type="time" class="wt-input" data-day="${d}" data-type="homeTime2" value="${t.homeTime2 || ''}">
-          ${isWeekend ? `<input type="time" class="wt-input" data-day="${d}" data-type="homeTime3" value="${t.homeTime3 || ''}">` : ''}
+          ${extraSlots >= 1 ? `<input type="time" class="wt-input" data-day="${d}" data-type="homeTime3" value="${t.homeTime3 || ''}">` : ''}
+          ${extraSlots >= 2 ? `<input type="time" class="wt-input" data-day="${d}" data-type="homeTime4" value="${t.homeTime4 || ''}">` : ''}
         </div>
         <div class="wt-row">
           <span class="wt-icon">📚</span>
           <input type="time" class="wt-input" data-day="${d}" data-type="studyroomTime" value="${t.studyroomTime || ''}">
           <input type="time" class="wt-input" data-day="${d}" data-type="studyroomTime2" value="${t.studyroomTime2 || ''}">
-          ${isWeekend ? `<input type="time" class="wt-input" data-day="${d}" data-type="studyroomTime3" value="${t.studyroomTime3 || ''}">` : ''}
+          ${extraSlots >= 1 ? `<input type="time" class="wt-input" data-day="${d}" data-type="studyroomTime3" value="${t.studyroomTime3 || ''}">` : ''}
+          ${extraSlots >= 2 ? `<input type="time" class="wt-input" data-day="${d}" data-type="studyroomTime4" value="${t.studyroomTime4 || ''}">` : ''}
         </div>
       `;
       timesGrid.appendChild(col);

@@ -53,9 +53,9 @@ export default {
     // POST /api/sync — 오늘 플랜 동기화
     if (path === '/api/sync' && request.method === 'POST') {
       const body = await request.json();
-      const { date, homeTime, homeTime2, homeTime3, studyroomTime, studyroomTime2, studyroomTime3, todayNote, tasks, subjects, dday, appUrl, weeklyTimetable, prevDay } = body;
+      const { date, homeTime, homeTime2, homeTime3, homeTime4, studyroomTime, studyroomTime2, studyroomTime3, studyroomTime4, todayNote, tasks, subjects, dday, appUrl, weeklyTimetable, prevDay } = body;
       if (!date) return json({ error: 'date 필드가 필요합니다' }, 400);
-      await env.KV.put(`plan:${date}`, JSON.stringify({ homeTime, homeTime2, homeTime3, studyroomTime, studyroomTime2, studyroomTime3, todayNote, tasks, subjects, dday, appUrl, weeklyTimetable, prevDay, syncedAt: Date.now() }));
+      await env.KV.put(`plan:${date}`, JSON.stringify({ homeTime, homeTime2, homeTime3, homeTime4, studyroomTime, studyroomTime2, studyroomTime3, studyroomTime4, todayNote, tasks, subjects, dday, appUrl, weeklyTimetable, prevDay, syncedAt: Date.now() }));
       return json({ ok: true });
     }
 
@@ -99,12 +99,12 @@ function buildMessage(dateStr, plan) {
   let msg = `[스터디플래너] ${dateLabel}\n`;
 
   // 시간 계획
-  if (plan?.homeTime || plan?.homeTime2 || plan?.homeTime3) {
-    const times = [plan.homeTime, plan.homeTime2, plan.homeTime3].filter(Boolean).join(', ');
+  if (plan?.homeTime || plan?.homeTime2 || plan?.homeTime3 || plan?.homeTime4) {
+    const times = [plan.homeTime, plan.homeTime2, plan.homeTime3, plan.homeTime4].filter(Boolean).join(', ');
     msg += `\n🏠 집에 오는 시간: ${times}`;
   }
-  if (plan?.studyroomTime || plan?.studyroomTime2 || plan?.studyroomTime3) {
-    const times = [plan.studyroomTime, plan.studyroomTime2, plan.studyroomTime3].filter(Boolean).join(', ');
+  if (plan?.studyroomTime || plan?.studyroomTime2 || plan?.studyroomTime3 || plan?.studyroomTime4) {
+    const times = [plan.studyroomTime, plan.studyroomTime2, plan.studyroomTime3, plan.studyroomTime4].filter(Boolean).join(', ');
     msg += `\n📚 독서실 가는 시간: ${times}`;
   }
   if (plan?.homeTime || plan?.studyroomTime) msg += '\n';
