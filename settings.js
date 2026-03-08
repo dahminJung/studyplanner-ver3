@@ -6,11 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // 기본 설정된 과목 및 색상 불러오기
   let subjects = JSON.parse(localStorage.getItem('studyPlannerSubjects')) || [
-    { id: 1, name: '수학', color: '#fca5a5' },
-    { id: 2, name: '영어', color: '#93c5fd' }
+    { id: 1, name: '수학', color: '#fecaca' },
+    { id: 2, name: '영어', color: '#bfdbfe' }
   ];
 
-  let selectedColor = '#fca5a5';
+  let selectedColor = '#fecaca';
 
   // 팔레트 색상 선택 기능
   paletteBtns.forEach(btn => {
@@ -32,16 +32,41 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    const paletteColors = ['#fecaca','#fed7aa','#fef08a','#bbf7d0','#a5f3fc','#bfdbfe','#ddd6fe','#fbcfe8','#1e3a8a'];
+
     subjects.forEach(subject => {
       const li = document.createElement('li');
       li.className = 'subject-item';
       li.innerHTML = `
         <div class="subject-info">
-          <span class="subject-color-dot" style="background-color: ${subject.color}"></span>
+          <button class="subject-color-dot subject-color-edit-btn" style="background-color: ${subject.color}; border: none; cursor: pointer; border-radius: 50%; width: 20px; height: 20px;" title="색상 변경" data-id="${subject.id}"></button>
           <span class="subject-name">${subject.name}</span>
         </div>
+        <div class="subject-color-palette" id="color-edit-${subject.id}" style="display:none; gap: 6px; flex-wrap: wrap; margin: 0.4rem 0 0 28px;"></div>
         <button class="delete-btn" data-id="${subject.id}">&times;</button>
       `;
+
+      const palette = li.querySelector(`#color-edit-${subject.id}`);
+      paletteColors.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'palette-btn' + (c === subject.color ? ' selected' : '');
+        btn.style.backgroundColor = c;
+        btn.dataset.color = c;
+        btn.addEventListener('click', () => {
+          const idx = subjects.findIndex(s => s.id === subject.id);
+          if (idx !== -1) subjects[idx].color = c;
+          saveAndRender();
+        });
+        palette.appendChild(btn);
+      });
+
+      li.querySelector('.subject-color-edit-btn').addEventListener('click', () => {
+        const isOpen = palette.style.display === 'flex';
+        // 다른 열린 팔레트 닫기
+        subjectList.querySelectorAll('.subject-color-palette').forEach(p => p.style.display = 'none');
+        palette.style.display = isOpen ? 'none' : 'flex';
+      });
+
       subjectList.appendChild(li);
     });
 

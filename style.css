@@ -834,12 +834,18 @@ body {
 
 .subject-item {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
   background: var(--bg-app);
   border-radius: 8px;
   border: 1px solid var(--border-color);
+}
+
+.subject-color-palette {
+  width: 100%;
+  display: flex;
 }
 
 .subject-info {
