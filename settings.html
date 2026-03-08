@@ -109,21 +109,6 @@
         <p id="notif-msg" class="notif-msg" style="display:none;"></p>
       </div>
 
-      <div class="notif-guide card" style="margin-top: 1.5rem; background: var(--bg-app);">
-        <div class="section-label">설정 가이드</div>
-        <ol class="notif-guide-list">
-          <li>Cloudflare 계정에서 <strong>Workers & Pages → Create Worker</strong></li>
-          <li><code>worker/</code> 폴더 안의 코드를 붙여넣고 배포</li>
-          <li><code>wrangler kv:namespace create "KV"</code> 실행 후 <code>wrangler.toml</code>의 id 업데이트</li>
-          <li>아래 명령으로 시크릿 등록:
-            <pre class="notif-code">wrangler secret put API_KEY
-wrangler secret put SOLAPI_API_KEY
-wrangler secret put SOLAPI_API_SECRET
-wrangler secret put SOLAPI_FROM</pre>
-          </li>
-          <li>위 폼에 Worker URL, API Key, 수신 전화번호 입력 후 저장</li>
-        </ol>
-      </div>
     </section>
   </div>
   <script type="module" src="/settings.js"></script>
