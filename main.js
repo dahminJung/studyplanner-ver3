@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const todayStr = getDateStr();
   const todayDate = new Date();
+  const dayOfWeek = todayDate.getDay();
+  const todayDayIdx = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // 0: Mon ~ 6: Sun
   const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
   if (dateDisplay) {
     dateDisplay.textContent = todayDate.toLocaleDateString('ko-KR', dateOptions);
@@ -248,8 +250,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const startTime = 6;
   const hoursToRender = 21;
   const dailyHeaderRow = document.getElementById('daily-header-row');
-  const dayOfWeek = todayDate.getDay();
-  const todayDayIdx = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
   const dayNames = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
   if (dailyHeaderRow) {
