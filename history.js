@@ -6,6 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const subjects = JSON.parse(localStorage.getItem('studyPlannerSubjects')) || [];
   const history = JSON.parse(localStorage.getItem('studyPlannerHistory')) || {};
 
+  function esc(str) {
+    return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
   // ─── 날짜 유틸 ───────────────────────────────────────────
   function getDateStr(date) {
     const d = date || new Date();
@@ -91,8 +95,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     dates.forEach(dateStr => {
       const entry = history[dateStr];
-      const tasks = entry.tasks || [];
-      const completed = tasks.filter(t => t.status === 'completed' || t.completed).length;
+      const tasks = (entry.tasks || []).map(t => ({
+        ...t,
+        status: t.status || (t.completed ? 'completed' : 'pending')
+      }));
+      const completed = tasks.filter(t => t.status === 'completed').length;
       const failed = tasks.filter(t => t.status === 'failed').length;
       const total = tasks.length;
       const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
@@ -104,14 +111,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const taskListHTML = tasks.length > 0
         ? tasks.map(t => {
             const subj = subjects.find(s => s.id === t.subjectId) || { name: '지정 안됨', color: '#cbd5e1' };
-            const status = t.status || (t.completed ? 'completed' : 'pending');
-            const icon = status === 'completed' ? '✓' : status === 'failed' ? '✗' : '○';
+            const icon = t.status === 'completed' ? '✓' : t.status === 'failed' ? '✗' : '○';
             return `
-              <div class="history-task-item status-${status}">
+              <div class="history-task-item status-${t.status}">
                 <span class="history-task-status-icon">${icon}</span>
                 <span class="history-task-dot" style="background-color: ${subj.color}"></span>
-                <span class="history-task-title">${t.title}</span>
-                <span class="history-task-badge" style="background-color: ${subj.color}">${subj.name}</span>
+                <span class="history-task-title">${esc(t.title)}</span>
+                <span class="history-task-badge" style="background-color: ${subj.color}">${esc(subj.name)}</span>
               </div>
             `;
           }).join('')

@@ -60,6 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   localStorage.setItem('studyPlannerLastDate', todayStr);
 
+  // ─── 유틸 ────────────────────────────────────────────────
+  function esc(str) {
+    return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
   // ─── 과목 / 할일 / 즐겨찾기 데이터 ──────────────────────
   let subjects = JSON.parse(localStorage.getItem('studyPlannerSubjects')) || [
     { id: 1, name: '수학', color: '#fca5a5' },
@@ -177,10 +182,10 @@ document.addEventListener('DOMContentLoaded', () => {
           <button type="button" class="task-status-btn task-done-btn ${status === 'completed' ? 'active' : ''}" data-id="${task.id}" data-action="complete" title="완료">✓</button>
           <button type="button" class="task-status-btn task-fail-btn ${status === 'failed' ? 'active' : ''}" data-id="${task.id}" data-action="fail" title="실패">✗</button>
           <div class="task-body">
-            <span class="task-title-text">${task.title}</span>
-            ${task.detail ? `<span class="task-detail-text">${task.detail}</span>` : ''}
+            <span class="task-title-text">${esc(task.title)}</span>
+            ${task.detail ? `<span class="task-detail-text">${esc(task.detail)}</span>` : ''}
           </div>
-          <span class="task-subject-badge" style="background-color: ${subject.color}">${subject.name}</span>
+          <span class="task-subject-badge" style="background-color: ${subject.color}">${esc(subject.name)}</span>
           <button type="button" class="task-delete-btn" data-id="${task.id}">&times;</button>
         `;
         taskList.appendChild(item);
@@ -210,7 +215,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const ddayRaw = JSON.parse(localStorage.getItem('studyPlannerDday') || 'null');
     const wTimes = JSON.parse(localStorage.getItem('studyPlannerWeeklyTimes') || '{}');
     const todayT = wTimes[todayDayIdx] || {};
-    const cfg2 = JSON.parse(localStorage.getItem('studyPlannerNotif') || '{}');
 
     // 전날 데이터 (history에서 가져오기)
     const yesterday = new Date(todayDate);
@@ -230,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
       studyroomTime3: todayT.studyroomTime3 || '',
       studyroomTime4: todayT.studyroomTime4 || '',
       todayNote: localStorage.getItem('studyPlannerTodayNote') || '',
-      appUrl: cfg2.appUrl || '',
+      appUrl: cfg.appUrl || '',
       tasks: JSON.parse(localStorage.getItem('studyPlannerTasks') || '[]'),
       subjects: JSON.parse(localStorage.getItem('studyPlannerSubjects') || '[]'),
       dday: ddayRaw,
