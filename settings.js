@@ -116,23 +116,61 @@ document.addEventListener('DOMContentLoaded', () => {
       const subject = subjects.find(s => s.id === qt.subjectId) || { name: '지정 안됨', color: '#cbd5e1' };
       const li = document.createElement('li');
       li.className = 'subject-item';
+      li.dataset.qtId = qt.id;
       li.innerHTML = `
-        <div class="subject-info">
+        <div class="subject-info" style="flex: 1; min-width: 0;">
           <span class="subject-color-dot" style="background-color: ${subject.color}"></span>
-          <span class="subject-name">${qt.title}</span>
-          <span style="font-size: 0.75rem; color: var(--text-muted);">${subject.name}</span>
+          <span class="subject-name qt-title-display">${qt.title}</span>
+          <input class="qt-title-input form-input" value="${qt.title}" style="display:none; padding: 0.3rem 0.5rem; font-size: 0.9rem; flex: 1;">
+          <span style="font-size: 0.75rem; color: var(--text-muted); white-space: nowrap;">${subject.name}</span>
         </div>
-        <button class="delete-btn" data-qt-id="${qt.id}">&times;</button>
+        <div class="qt-actions">
+          <button class="qt-edit-btn icon-btn" title="제목 수정">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          </button>
+          <button class="qt-save-btn primary-btn" style="display:none; padding: 0.25rem 0.6rem; font-size: 0.82rem;">저장</button>
+          <button class="delete-btn" title="삭제">&times;</button>
+        </div>
       `;
-      quickTaskList.appendChild(li);
-    });
-    document.querySelectorAll('[data-qt-id]').forEach(btn => {
-      btn.addEventListener('click', e => {
-        const id = parseInt(e.target.dataset.qtId);
-        quickTasks = quickTasks.filter(qt => qt.id !== id);
+
+      const titleDisplay = li.querySelector('.qt-title-display');
+      const titleInput = li.querySelector('.qt-title-input');
+      const editBtn = li.querySelector('.qt-edit-btn');
+      const saveBtn = li.querySelector('.qt-save-btn');
+      const deleteBtn = li.querySelector('.delete-btn');
+
+      editBtn.addEventListener('click', () => {
+        titleDisplay.style.display = 'none';
+        titleInput.style.display = 'block';
+        titleInput.focus();
+        editBtn.style.display = 'none';
+        saveBtn.style.display = 'inline-block';
+      });
+
+      function saveTitle() {
+        const newTitle = titleInput.value.trim();
+        if (!newTitle) return;
+        const idx = quickTasks.findIndex(q => q.id === qt.id);
+        if (idx !== -1) {
+          quickTasks[idx].title = newTitle;
+          localStorage.setItem('studyPlannerQuickTasks', JSON.stringify(quickTasks));
+        }
+        renderQuickTasks();
+      }
+
+      saveBtn.addEventListener('click', saveTitle);
+      titleInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') saveTitle();
+        if (e.key === 'Escape') renderQuickTasks();
+      });
+
+      deleteBtn.addEventListener('click', () => {
+        quickTasks = quickTasks.filter(q => q.id !== qt.id);
         localStorage.setItem('studyPlannerQuickTasks', JSON.stringify(quickTasks));
         renderQuickTasks();
       });
+
+      quickTaskList.appendChild(li);
     });
   }
 

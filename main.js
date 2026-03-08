@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const titleInput = document.getElementById('new-task-title');
   const dateDisplay = document.getElementById('current-date-display');
   const goalInput = document.querySelector('.goal-content input');
-  const reflectionTextarea = document.querySelector('.reflection textarea');
+  const reflectionTextarea = document.getElementById('daily-reflection');
+  const memoTextarea = document.getElementById('daily-memo');
 
   // ─── 날짜 유틸 ───────────────────────────────────────────
   function getDateStr(date) {
@@ -31,7 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
     history[lastDateStr] = {
       goal: localStorage.getItem('studyPlannerDailyGoal') || '',
       tasks: JSON.parse(localStorage.getItem('studyPlannerTasks')) || [],
-      reflection: localStorage.getItem('studyPlannerDailyReflection') || ''
+      reflection: localStorage.getItem('studyPlannerDailyReflection') || '',
+      memo: localStorage.getItem('studyPlannerDailyMemo') || ''
     };
     localStorage.setItem('studyPlannerHistory', JSON.stringify(history));
 
@@ -39,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.removeItem('studyPlannerTasks');
     localStorage.removeItem('studyPlannerDailyGoal');
     localStorage.removeItem('studyPlannerDailyReflection');
+    localStorage.removeItem('studyPlannerDailyMemo');
   }
   localStorage.setItem('studyPlannerLastDate', todayStr);
 
@@ -66,6 +69,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (savedReflection) reflectionTextarea.value = savedReflection;
     reflectionTextarea.addEventListener('input', () => {
       localStorage.setItem('studyPlannerDailyReflection', reflectionTextarea.value);
+    });
+  }
+
+  // ─── Memo 저장/불러오기 ───────────────────────────────────
+  if (memoTextarea) {
+    const savedMemo = localStorage.getItem('studyPlannerDailyMemo');
+    if (savedMemo) memoTextarea.value = savedMemo;
+    memoTextarea.addEventListener('input', () => {
+      localStorage.setItem('studyPlannerDailyMemo', memoTextarea.value);
     });
   }
 
@@ -108,11 +120,13 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       tasks.forEach(task => {
         const subject = subjects.find(s => s.id === task.subjectId) || { name: '지정 안됨', color: '#cbd5e1' };
+        const status = task.status || 'pending'; // 'pending' | 'completed' | 'failed'
         const item = document.createElement('div');
-        item.className = `task-item ${task.completed ? 'completed' : ''}`;
+        item.className = `task-item status-${status}`;
         item.style.borderLeftColor = subject.color;
         item.innerHTML = `
-          <input type="checkbox" class="task-checkbox" data-id="${task.id}" ${task.completed ? 'checked' : ''}>
+          <button type="button" class="task-status-btn task-done-btn ${status === 'completed' ? 'active' : ''}" data-id="${task.id}" data-action="complete" title="완료">✓</button>
+          <button type="button" class="task-status-btn task-fail-btn ${status === 'failed' ? 'active' : ''}" data-id="${task.id}" data-action="fail" title="실패">✗</button>
           <span class="task-title-text">${task.title}</span>
           <span class="task-subject-badge" style="background-color: ${subject.color}">${subject.name}</span>
           <button type="button" class="task-delete-btn" data-id="${task.id}">&times;</button>
@@ -125,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateTaskCount() {
     if (!countDisplay) return;
-    const completed = tasks.filter(t => t.completed).length;
+    const completed = tasks.filter(t => t.status === 'completed').length;
     countDisplay.textContent = `${completed} / ${tasks.length}`;
   }
 
@@ -143,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('할 일과 과목을 모두 입력/선택해주세요.');
         return;
       }
-      tasks.push({ id: Date.now(), title, subjectId, completed: false });
+      tasks.push({ id: Date.now(), title, subjectId, status: 'pending' });
       titleInput.value = '';
       subjectSelect.value = '';
       saveAndRenderTasks();
@@ -151,18 +165,21 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (taskList) {
-    taskList.addEventListener('change', (e) => {
-      if (e.target.classList.contains('task-checkbox')) {
+    taskList.addEventListener('click', (e) => {
+      if (e.target.classList.contains('task-status-btn')) {
         const id = parseInt(e.target.dataset.id);
+        const action = e.target.dataset.action;
         const task = tasks.find(t => t.id === id);
         if (task) {
-          task.completed = e.target.checked;
+          const current = task.status || 'pending';
+          if (action === 'complete') {
+            task.status = current === 'completed' ? 'pending' : 'completed';
+          } else if (action === 'fail') {
+            task.status = current === 'failed' ? 'pending' : 'failed';
+          }
           saveAndRenderTasks();
         }
       }
-    });
-
-    taskList.addEventListener('click', (e) => {
       if (e.target.classList.contains('task-delete-btn')) {
         const id = parseInt(e.target.dataset.id);
         tasks = tasks.filter(t => t.id !== id);
@@ -240,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
       chip.innerHTML = `<span class="quick-task-chip-dot" style="background-color: ${subject.color}"></span>${qt.title}`;
       chip.title = `${qt.title} (${subject.name}) — 클릭하여 바로 추가`;
       chip.addEventListener('click', () => {
-        tasks.push({ id: Date.now(), title: qt.title, subjectId: qt.subjectId, completed: false });
+        tasks.push({ id: Date.now(), title: qt.title, subjectId: qt.subjectId, status: 'pending' });
         saveAndRenderTasks();
       });
       row.appendChild(chip);

@@ -92,7 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
     dates.forEach(dateStr => {
       const entry = history[dateStr];
       const tasks = entry.tasks || [];
-      const completed = tasks.filter(t => t.completed).length;
+      const completed = tasks.filter(t => t.status === 'completed' || t.completed).length;
+      const failed = tasks.filter(t => t.status === 'failed').length;
       const total = tasks.length;
       const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
 
@@ -103,8 +104,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const taskListHTML = tasks.length > 0
         ? tasks.map(t => {
             const subj = subjects.find(s => s.id === t.subjectId) || { name: '지정 안됨', color: '#cbd5e1' };
+            const status = t.status || (t.completed ? 'completed' : 'pending');
+            const icon = status === 'completed' ? '✓' : status === 'failed' ? '✗' : '○';
             return `
-              <div class="history-task-item ${t.completed ? 'completed' : ''}">
+              <div class="history-task-item status-${status}">
+                <span class="history-task-status-icon">${icon}</span>
                 <span class="history-task-dot" style="background-color: ${subj.color}"></span>
                 <span class="history-task-title">${t.title}</span>
                 <span class="history-task-badge" style="background-color: ${subj.color}">${subj.name}</span>
@@ -138,6 +142,12 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           <div class="history-task-list">${taskListHTML}</div>
         </div>
+
+        ${entry.memo ? `
+        <div class="history-section">
+          <div class="history-section-label">MEMO</div>
+          <div class="history-reflection-text">${entry.memo}</div>
+        </div>` : ''}
 
         ${entry.reflection ? `
         <div class="history-section">

@@ -208,6 +208,76 @@ body {
   color: #ef4444;
 }
 
+/* Task status buttons (완료/실패) */
+.task-status-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-color);
+  background: transparent;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  color: var(--text-muted);
+  padding: 0;
+}
+
+.task-done-btn:hover,
+.task-done-btn.active {
+  background: #dcfce7;
+  border-color: #22c55e;
+  color: #16a34a;
+}
+
+.task-fail-btn:hover,
+.task-fail-btn.active {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #dc2626;
+}
+
+/* Task item status styles */
+.task-item.status-completed .task-title-text {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.task-item.status-failed .task-title-text {
+  text-decoration: line-through;
+  color: #ef4444;
+  opacity: 0.7;
+}
+
+/* Memo section */
+.memo textarea {
+  width: 100%;
+  min-height: 120px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  outline: none;
+}
+
+.memo textarea:focus {
+  border-color: var(--primary);
+}
+
+/* Quick task actions */
+.qt-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
 /* Time Table */
 .timeline-box {
   border: 1px solid var(--border-color);
