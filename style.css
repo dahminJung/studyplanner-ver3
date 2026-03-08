@@ -100,6 +100,12 @@ body {
   letter-spacing: 0.03em;
 }
 
+.daily-plan-times-row {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
 .daily-plan-time-display {
   padding: 0.55rem 0.75rem;
   border-radius: 8px;

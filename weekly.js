@@ -259,10 +259,12 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="wt-row">
           <span class="wt-icon">🏠</span>
           <input type="time" class="wt-input" data-day="${d}" data-type="homeTime" value="${t.homeTime || ''}">
+          <input type="time" class="wt-input" data-day="${d}" data-type="homeTime2" value="${t.homeTime2 || ''}">
         </div>
         <div class="wt-row">
           <span class="wt-icon">📚</span>
           <input type="time" class="wt-input" data-day="${d}" data-type="studyroomTime" value="${t.studyroomTime || ''}">
+          <input type="time" class="wt-input" data-day="${d}" data-type="studyroomTime2" value="${t.studyroomTime2 || ''}">
         </div>
       `;
       timesGrid.appendChild(col);

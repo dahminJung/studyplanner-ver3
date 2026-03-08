@@ -53,9 +53,9 @@ export default {
     // POST /api/sync — 오늘 플랜 동기화
     if (path === '/api/sync' && request.method === 'POST') {
       const body = await request.json();
-      const { date, homeTime, studyroomTime, todayNote, tasks, subjects, dday, appUrl } = body;
+      const { date, homeTime, homeTime2, studyroomTime, studyroomTime2, todayNote, tasks, subjects, dday, appUrl } = body;
       if (!date) return json({ error: 'date 필드가 필요합니다' }, 400);
-      await env.KV.put(`plan:${date}`, JSON.stringify({ homeTime, studyroomTime, todayNote, tasks, subjects, dday, appUrl, syncedAt: Date.now() }));
+      await env.KV.put(`plan:${date}`, JSON.stringify({ homeTime, homeTime2, studyroomTime, studyroomTime2, todayNote, tasks, subjects, dday, appUrl, syncedAt: Date.now() }));
       return json({ ok: true });
     }
 
@@ -99,8 +99,14 @@ function buildMessage(dateStr, plan) {
   let msg = `[스터디플래너] ${dateLabel}\n`;
 
   // 시간 계획
-  if (plan?.homeTime) msg += `\n🏠 집에 오는 시간: ${plan.homeTime}`;
-  if (plan?.studyroomTime) msg += `\n📚 독서실 가는 시간: ${plan.studyroomTime}`;
+  if (plan?.homeTime || plan?.homeTime2) {
+    const times = [plan.homeTime, plan.homeTime2].filter(Boolean).join(', ');
+    msg += `\n🏠 집에 오는 시간: ${times}`;
+  }
+  if (plan?.studyroomTime || plan?.studyroomTime2) {
+    const times = [plan.studyroomTime, plan.studyroomTime2].filter(Boolean).join(', ');
+    msg += `\n📚 독서실 가는 시간: ${times}`;
+  }
   if (plan?.homeTime || plan?.studyroomTime) msg += '\n';
 
   // D-Day

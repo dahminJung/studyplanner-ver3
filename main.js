@@ -8,7 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const titleInput = document.getElementById('new-task-title');
   const dateDisplay = document.getElementById('current-date-display');
   const homeTimeDisplay = document.getElementById('daily-home-time');
+  const homeTime2Display = document.getElementById('daily-home-time2');
   const studyroomTimeDisplay = document.getElementById('daily-studyroom-time');
+  const studyroomTime2Display = document.getElementById('daily-studyroom-time2');
   const todayNoteInput = document.getElementById('daily-today-note');
   const reflectionTextarea = document.getElementById('daily-reflection');
   const memoTextarea = document.getElementById('daily-memo');
@@ -70,7 +72,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const weeklyTimes = JSON.parse(localStorage.getItem('studyPlannerWeeklyTimes') || '{}');
   const todayTimes = weeklyTimes[todayDayIdx] || {};
   if (homeTimeDisplay) homeTimeDisplay.textContent = todayTimes.homeTime || '--:--';
+  if (homeTime2Display) {
+    if (todayTimes.homeTime2) { homeTime2Display.textContent = todayTimes.homeTime2; homeTime2Display.style.display = ''; }
+    else homeTime2Display.style.display = 'none';
+  }
   if (studyroomTimeDisplay) studyroomTimeDisplay.textContent = todayTimes.studyroomTime || '--:--';
+  if (studyroomTime2Display) {
+    if (todayTimes.studyroomTime2) { studyroomTime2Display.textContent = todayTimes.studyroomTime2; studyroomTime2Display.style.display = ''; }
+    else studyroomTime2Display.style.display = 'none';
+  }
 
   if (todayNoteInput) {
     todayNoteInput.value = localStorage.getItem('studyPlannerTodayNote') || '';
@@ -184,7 +194,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const payload = {
       date: todayStr,
       homeTime: todayT.homeTime || '',
+      homeTime2: todayT.homeTime2 || '',
       studyroomTime: todayT.studyroomTime || '',
+      studyroomTime2: todayT.studyroomTime2 || '',
       todayNote: localStorage.getItem('studyPlannerTodayNote') || '',
       appUrl: cfg2.appUrl || '',
       tasks: JSON.parse(localStorage.getItem('studyPlannerTasks') || '[]'),
