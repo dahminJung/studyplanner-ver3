@@ -278,6 +278,186 @@ body {
   flex-shrink: 0;
 }
 
+/* ─── Task 바디 (제목 + detail) ─────────────── */
+.task-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.task-detail-text {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+/* ⭐ 즐겨찾기 버튼 */
+.task-star-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--border-color);
+  padding: 0 2px;
+  transition: color 0.15s, transform 0.15s;
+  flex-shrink: 0;
+}
+
+.task-star-btn:hover {
+  color: #f59e0b;
+  transform: scale(1.2);
+}
+
+.task-star-btn.starred {
+  color: #f59e0b;
+}
+
+/* ─── Quick Task 팝업 ───────────────────────── */
+.qt-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.15s ease;
+}
+
+.qt-popup {
+  background: white;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  width: min(360px, 90vw);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  animation: slideUp 0.2s ease;
+}
+
+.qt-popup-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.qt-popup-chip-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.qt-popup-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  flex: 1;
+}
+
+.qt-popup-subject-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.qt-popup-detail {
+  width: 100%;
+  border: 1.5px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+  color: var(--text-main);
+}
+
+.qt-popup-detail:focus {
+  border-color: var(--primary);
+}
+
+.qt-popup-btns {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.qt-popup-cancel-btn {
+  background: var(--bg-app);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.qt-popup-cancel-btn:hover {
+  background: var(--border-color);
+}
+
+/* ─── Settings Quick Task 목록 ──────────────── */
+.qt-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.75rem 1rem;
+  background: var(--bg-app);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  gap: 0.5rem;
+}
+
+.qt-list-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.qt-list-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.qt-list-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.qt-subject-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.qt-detail-display {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.4;
+  background: white;
+  padding: 0.35rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
 /* Time Table */
 .timeline-box {
   border: 1px solid var(--border-color);

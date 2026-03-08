@@ -111,6 +111,22 @@
       </section>
     </footer>
   </div>
+  <!-- Quick Task 추가 팝업 -->
+  <div id="qt-popup-overlay" class="qt-popup-overlay" style="display:none;">
+    <div class="qt-popup">
+      <div class="qt-popup-header">
+        <span class="qt-popup-chip-dot" id="qt-popup-dot"></span>
+        <span class="qt-popup-name" id="qt-popup-name"></span>
+        <span class="qt-popup-subject-label" id="qt-popup-subject-label"></span>
+      </div>
+      <textarea id="qt-popup-detail" class="qt-popup-detail" placeholder="자세한 내용을 입력하세요 (선택사항)" rows="4"></textarea>
+      <div class="qt-popup-btns">
+        <button id="qt-popup-cancel" class="qt-popup-cancel-btn">취소</button>
+        <button id="qt-popup-confirm" class="primary-btn">추가</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="/main.js"></script>
 </body>
 </html>

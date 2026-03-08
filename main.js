@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // ─── 매일 리셋 & 기록 보관 ───────────────────────────────
   const lastDateStr = localStorage.getItem('studyPlannerLastDate');
   if (lastDateStr && lastDateStr !== todayStr) {
-    // 이전 날 데이터 기록 보관
     const history = JSON.parse(localStorage.getItem('studyPlannerHistory')) || {};
     history[lastDateStr] = {
       goal: localStorage.getItem('studyPlannerDailyGoal') || '',
@@ -36,8 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
       memo: localStorage.getItem('studyPlannerDailyMemo') || ''
     };
     localStorage.setItem('studyPlannerHistory', JSON.stringify(history));
-
-    // 오늘 데이터 초기화
     localStorage.removeItem('studyPlannerTasks');
     localStorage.removeItem('studyPlannerDailyGoal');
     localStorage.removeItem('studyPlannerDailyReflection');
@@ -45,14 +42,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   localStorage.setItem('studyPlannerLastDate', todayStr);
 
-  // ─── 과목 데이터 ─────────────────────────────────────────
+  // ─── 과목 / 할일 / 즐겨찾기 데이터 ──────────────────────
   let subjects = JSON.parse(localStorage.getItem('studyPlannerSubjects')) || [
     { id: 1, name: '수학', color: '#fca5a5' },
     { id: 2, name: '영어', color: '#93c5fd' }
   ];
-
-  // ─── 할 일 데이터 ─────────────────────────────────────────
   let tasks = JSON.parse(localStorage.getItem('studyPlannerTasks')) || [];
+  let quickTasks = JSON.parse(localStorage.getItem('studyPlannerQuickTasks')) || [];
+
+  function saveQuickTasks() {
+    localStorage.setItem('studyPlannerQuickTasks', JSON.stringify(quickTasks));
+  }
 
   // ─── Goal 저장/불러오기 ───────────────────────────────────
   if (goalInput) {
@@ -110,6 +110,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // ─── 즐겨찾기 여부 확인 ───────────────────────────────────
+  function isQuickTask(task) {
+    return quickTasks.some(qt => qt.title === task.title && qt.subjectId === task.subjectId);
+  }
+
   // ─── 할 일 렌더링 ─────────────────────────────────────────
   function renderTasks() {
     if (!taskList) return;
@@ -120,15 +125,22 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       tasks.forEach(task => {
         const subject = subjects.find(s => s.id === task.subjectId) || { name: '지정 안됨', color: '#cbd5e1' };
-        const status = task.status || 'pending'; // 'pending' | 'completed' | 'failed'
+        const status = task.status || 'pending';
+        const starred = isQuickTask(task);
+
         const item = document.createElement('div');
         item.className = `task-item status-${status}`;
         item.style.borderLeftColor = subject.color;
+
         item.innerHTML = `
           <button type="button" class="task-status-btn task-done-btn ${status === 'completed' ? 'active' : ''}" data-id="${task.id}" data-action="complete" title="완료">✓</button>
           <button type="button" class="task-status-btn task-fail-btn ${status === 'failed' ? 'active' : ''}" data-id="${task.id}" data-action="fail" title="실패">✗</button>
-          <span class="task-title-text">${task.title}</span>
+          <div class="task-body">
+            <span class="task-title-text">${task.title}</span>
+            ${task.detail ? `<span class="task-detail-text">${task.detail}</span>` : ''}
+          </div>
           <span class="task-subject-badge" style="background-color: ${subject.color}">${subject.name}</span>
+          <button type="button" class="task-star-btn ${starred ? 'starred' : ''}" data-id="${task.id}" title="${starred ? '즐겨찾기 제거' : '즐겨찾기 추가'}">★</button>
           <button type="button" class="task-delete-btn" data-id="${task.id}">&times;</button>
         `;
         taskList.appendChild(item);
@@ -146,8 +158,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveAndRenderTasks() {
     localStorage.setItem('studyPlannerTasks', JSON.stringify(tasks));
     renderTasks();
+    renderQuickTaskChips();
   }
 
+  // ─── Task 폼 제출 ─────────────────────────────────────────
   if (taskForm) {
     taskForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -157,29 +171,46 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('할 일과 과목을 모두 입력/선택해주세요.');
         return;
       }
-      tasks.push({ id: Date.now(), title, subjectId, status: 'pending' });
+      tasks.push({ id: Date.now(), title, subjectId, status: 'pending', detail: '' });
       titleInput.value = '';
       subjectSelect.value = '';
       saveAndRenderTasks();
     });
   }
 
+  // ─── Task 목록 이벤트 ─────────────────────────────────────
   if (taskList) {
     taskList.addEventListener('click', (e) => {
+      // 완료/실패 버튼
       if (e.target.classList.contains('task-status-btn')) {
         const id = parseInt(e.target.dataset.id);
         const action = e.target.dataset.action;
         const task = tasks.find(t => t.id === id);
         if (task) {
           const current = task.status || 'pending';
-          if (action === 'complete') {
-            task.status = current === 'completed' ? 'pending' : 'completed';
-          } else if (action === 'fail') {
-            task.status = current === 'failed' ? 'pending' : 'failed';
-          }
+          if (action === 'complete') task.status = current === 'completed' ? 'pending' : 'completed';
+          else if (action === 'fail') task.status = current === 'failed' ? 'pending' : 'failed';
           saveAndRenderTasks();
         }
       }
+
+      // ⭐ 즐겨찾기 버튼
+      if (e.target.classList.contains('task-star-btn')) {
+        const id = parseInt(e.target.dataset.id);
+        const task = tasks.find(t => t.id === id);
+        if (!task) return;
+        const existingIdx = quickTasks.findIndex(qt => qt.title === task.title && qt.subjectId === task.subjectId);
+        if (existingIdx !== -1) {
+          quickTasks.splice(existingIdx, 1);
+        } else {
+          quickTasks.push({ id: Date.now(), title: task.title, subjectId: task.subjectId, detail: task.detail || '' });
+        }
+        saveQuickTasks();
+        renderTasks();
+        renderQuickTaskChips();
+      }
+
+      // 삭제 버튼
       if (e.target.classList.contains('task-delete-btn')) {
         const id = parseInt(e.target.dataset.id);
         tasks = tasks.filter(t => t.id !== id);
@@ -241,25 +272,75 @@ document.addEventListener('DOMContentLoaded', () => {
     if (ddayTitleEl) ddayTitleEl.textContent = ddayData.title;
   }
 
-  // ─── 자주 사용하는 Task 칩 ────────────────────────────────
+  // ─── Quick Task 팝업 ──────────────────────────────────────
+  const qtOverlay = document.getElementById('qt-popup-overlay');
+  const qtPopupName = document.getElementById('qt-popup-name');
+  const qtPopupDot = document.getElementById('qt-popup-dot');
+  const qtPopupSubjectLabel = document.getElementById('qt-popup-subject-label');
+  const qtPopupDetail = document.getElementById('qt-popup-detail');
+  const qtPopupConfirm = document.getElementById('qt-popup-confirm');
+  const qtPopupCancel = document.getElementById('qt-popup-cancel');
+
+  let pendingQuickTask = null;
+
+  function openQtPopup(qt) {
+    const subject = subjects.find(s => s.id === qt.subjectId) || { name: '지정 안됨', color: '#cbd5e1' };
+    pendingQuickTask = qt;
+    qtPopupName.textContent = qt.title;
+    qtPopupDot.style.backgroundColor = subject.color;
+    qtPopupSubjectLabel.textContent = subject.name;
+    qtPopupDetail.value = qt.detail || '';
+    qtOverlay.style.display = 'flex';
+    qtPopupDetail.focus();
+  }
+
+  function closeQtPopup() {
+    qtOverlay.style.display = 'none';
+    pendingQuickTask = null;
+  }
+
+  if (qtPopupConfirm) {
+    qtPopupConfirm.addEventListener('click', () => {
+      if (!pendingQuickTask) return;
+      tasks.push({
+        id: Date.now(),
+        title: pendingQuickTask.title,
+        subjectId: pendingQuickTask.subjectId,
+        status: 'pending',
+        detail: qtPopupDetail.value.trim()
+      });
+      saveAndRenderTasks();
+      closeQtPopup();
+    });
+  }
+
+  if (qtPopupCancel) qtPopupCancel.addEventListener('click', closeQtPopup);
+  if (qtOverlay) {
+    qtOverlay.addEventListener('click', (e) => {
+      if (e.target === qtOverlay) closeQtPopup();
+    });
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && qtOverlay && qtOverlay.style.display !== 'none') closeQtPopup();
+  });
+
+  // ─── Quick Task 칩 렌더링 ─────────────────────────────────
   function renderQuickTaskChips() {
+    quickTasks = JSON.parse(localStorage.getItem('studyPlannerQuickTasks')) || [];
     const row = document.getElementById('quick-tasks-row');
     if (!row) return;
-    const quickTasks = JSON.parse(localStorage.getItem('studyPlannerQuickTasks')) || [];
     row.innerHTML = '';
     if (quickTasks.length === 0) { row.style.display = 'none'; return; }
     row.style.display = 'flex';
+
     quickTasks.forEach(qt => {
       const subject = subjects.find(s => s.id === qt.subjectId) || { name: '지정 안됨', color: '#cbd5e1' };
       const chip = document.createElement('button');
       chip.type = 'button';
       chip.className = 'quick-task-chip';
       chip.innerHTML = `<span class="quick-task-chip-dot" style="background-color: ${subject.color}"></span>${qt.title}`;
-      chip.title = `${qt.title} (${subject.name}) — 클릭하여 바로 추가`;
-      chip.addEventListener('click', () => {
-        tasks.push({ id: Date.now(), title: qt.title, subjectId: qt.subjectId, status: 'pending' });
-        saveAndRenderTasks();
-      });
+      chip.title = `${qt.title} (${subject.name}) — 클릭하여 추가`;
+      chip.addEventListener('click', () => openQtPopup(qt));
       row.appendChild(chip);
     });
   }
