@@ -103,11 +103,6 @@ function buildMessage(dateStr, plan) {
   if (plan?.studyroomTime) msg += `\n📚 독서실 가는 시간: ${plan.studyroomTime}`;
   if (plan?.homeTime || plan?.studyroomTime) msg += '\n';
 
-  // 오늘 할 일 메모
-  if (plan?.todayNote) {
-    msg += `\n📝 오늘 할 일\n${plan.todayNote}\n`;
-  }
-
   // D-Day
   if (plan?.dday?.date && plan?.dday?.title) {
     const t = new Date(dateStr);
@@ -117,16 +112,16 @@ function buildMessage(dateStr, plan) {
     msg += `\n🎯 ${plan.dday.title}: ${ddayLabel}\n`;
   }
 
-  // 할 일
+  // Tasks 목록
   const tasks = plan?.tasks || [];
-  const pending = tasks.filter(t => (t.status || 'pending') === 'pending');
   if (tasks.length > 0) {
-    msg += `\n📝 오늘의 할 일 (${tasks.length}개)\n`;
+    msg += `\n📋 할 일 (${tasks.length}개)\n`;
     tasks.forEach(t => {
       const subjects = plan?.subjects || [];
       const subj = subjects.find(s => s.id === t.subjectId);
       const label = subj ? `[${subj.name}] ` : '';
-      msg += `• ${label}${t.title}\n`;
+      const statusIcon = t.status === 'completed' ? '✓ ' : t.status === 'failed' ? '✗ ' : '• ';
+      msg += `${statusIcon}${label}${t.title}\n`;
     });
   } else {
     msg += '\n오늘 할 일을 앱에서 추가해보세요!\n';
