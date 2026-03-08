@@ -951,3 +951,215 @@ body {
   flex-shrink: 0;
 }
 
+/* ================================
+   History Page
+   ================================ */
+
+/* Filter Bar */
+.history-filter-bar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+}
+
+.history-filter-btn {
+  background: var(--bg-app);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  padding: 0.35rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.history-filter-btn:hover {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.history-filter-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+/* History List — mobile: 1 column */
+.history-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 768px) {
+  .history-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* History Card */
+.history-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.history-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.history-card-date {
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.history-card-ago {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+.history-task-stat {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.history-stat-num {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.history-stat-total {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.history-stat-label {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 0.15rem;
+}
+
+/* Section */
+.history-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.history-section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.history-goal-text {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--primary);
+  background: var(--primary-soft);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+}
+
+/* Progress Bar */
+.history-progress-bar {
+  height: 6px;
+  background: var(--border-color);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.history-progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+/* Task Items */
+.history-task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.history-task-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+}
+
+.history-task-item.completed .history-task-title {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.history-task-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.history-task-title {
+  flex: 1;
+  word-break: break-all;
+}
+
+.history-task-badge {
+  font-size: 0.65rem;
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: #fff;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.history-task-empty {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Reflection */
+.history-reflection-text {
+  font-size: 0.9rem;
+  color: var(--text-main);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  background: var(--bg-app);
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  border-left: 3px solid var(--border-color);
+}
+
+/* Empty state */
+.history-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+  text-align: center;
+  font-size: 0.95rem;
+}
+
