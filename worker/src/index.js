@@ -250,8 +250,8 @@ function isNavyColor(hex) {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
   const b = parseInt(hex.slice(5, 7), 16);
-  // 네이비: 파란색 계열이 지배적이고 전체적으로 어두운 색
-  return b > 80 && r < 80 && g < 80 && (r + g + b) < 200;
+  // 네이비: 파란색 계열이 지배적이고 전체적으로 어두운 색 (예: #1e3a8a → r=30,g=58,b=138)
+  return b > r * 1.5 && b > g && b > 80;
 }
 
 function json(data, status = 200) {
